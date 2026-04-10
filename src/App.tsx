@@ -24,9 +24,8 @@ const Footer = () => (
       </div>
       
       <div className="flex gap-8 text-sm font-medium text-neutral-500">
-        <a href="#" className="hover:text-brand-burgundy transition-colors">Instagram</a>
-        <a href="#" className="hover:text-brand-burgundy transition-colors">Pinterest</a>
-        <a href="#" className="hover:text-brand-burgundy transition-colors">LinkedIn</a>
+        <a href="https://www.instagram.com/nimishevents?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" className="hover:text-brand-burgundy transition-colors">Instagram</a>
+        <a href="https://www.linkedin.com/company/nimish-live" target="_blank" rel="noopener noreferrer" className="hover:text-brand-burgundy transition-colors">LinkedIn</a>
       </div>
       
       <p className="text-xs text-neutral-400 uppercase tracking-widest">

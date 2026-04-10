@@ -3,17 +3,31 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { useState, useEffect } from "react";
 import { motion } from "motion/react";
 import { cn } from "@/src/lib/utils";
 import { Logo } from "./Logo";
 
 export const Navbar = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <motion.nav
       initial={{ y: -100, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
-      className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-6"
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-6 transition-all duration-300",
+        isScrolled ? "bg-[#FAF9F6]/95 backdrop-blur-md shadow-sm border-b border-[#D4AF37]/20 py-4" : "bg-transparent"
+      )}
     >
       <div 
         className="group cursor-pointer"
