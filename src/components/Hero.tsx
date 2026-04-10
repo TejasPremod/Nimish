@@ -55,13 +55,16 @@ export const Hero = () => {
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="group relative px-10 py-5 bg-brand-burgundy text-brand-cream rounded-sm overflow-hidden flex items-center gap-3"
+              onClick={() => window.location.hash = "#vendors"}
+              className="group relative px-10 py-5 bg-brand-burgundy text-brand-cream rounded-sm overflow-hidden flex items-center gap-3 cursor-pointer"
             >
               <span className="relative z-10 font-medium text-lg">Plan Your Event</span>
               <ArrowRight className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" />
               <div className="absolute inset-0 bg-brand-gold/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
             </motion.button>
-            <button className="text-brand-burgundy font-medium text-lg border-b-2 border-brand-gold/30 hover:border-brand-gold transition-all py-1">
+            <button 
+              onClick={() => window.location.hash = "#portfolio"}
+              className="text-brand-burgundy font-medium text-lg border-b-2 border-brand-gold/30 hover:border-brand-gold transition-all py-1 cursor-pointer">
               View Portfolio
             </button>
           </motion.div>

@@ -15,7 +15,10 @@ export const Navbar = () => {
       transition={{ duration: 0.8, ease: "easeOut" }}
       className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-8 py-6"
     >
-      <div className="group cursor-pointer">
+      <div 
+        className="group cursor-pointer"
+        onClick={() => window.location.hash = "#home"}
+      >
         <Logo className="w-32 group-hover:scale-105 transition-transform duration-500" />
       </div>
 
