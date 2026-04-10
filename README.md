@@ -1,20 +1,40 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Nimish ✨  
+### Wedding & Event Planning Platform
 
-# Run and deploy your AI Studio app
+A modern, minimal platform to plan, manage, and execute unforgettable weddings and events — seamlessly.
 
-This contains everything you need to run your app locally.
+---
 
-View your app in AI Studio: https://ai.studio/apps/2102de9d-7013-4b66-9ad7-fdb33c068f8a
+## Overview
 
-## Run Locally
+**Nimish** is a streamlined event management application designed to simplify planning from start to finish. From vendor coordination to timeline management, everything lives in one clean interface.
 
-**Prerequisites:**  Node.js
+---
 
+## Features
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+- 📅 Event Planning Dashboard  
+- 💍 Wedding-specific workflows  
+- 📌 Task & Timeline Management  
+- 🤝 Vendor Management  
+- 💸 Budget Tracking  
+- 📝 Guest List Organization  
+- 📷 Media & Inspiration Boards  
+
+---
+
+## Tech Stack
+
+- **Frontend:** React / Next.js  
+- **Backend:** Node.js / Express  
+- **Database:** MongoDB / Firebase  
+- **Deployment:** Vercel  
+
+---
+
+## Getting Started
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/your-username/nimish.git
+cd nimish
