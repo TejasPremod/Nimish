@@ -32,9 +32,4 @@ A modern, minimal platform to plan, manage, and execute unforgettable weddings a
 
 ---
 
-## Getting Started
 
-### 1. Clone the repository
-```bash
-git clone https://github.com/your-username/nimish.git
-cd nimish
