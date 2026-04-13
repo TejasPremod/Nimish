@@ -8,8 +8,8 @@ import { ArrowRight } from "lucide-react";
 
 export const Hero = () => {
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center px-8 pt-20 overflow-hidden">
-      <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+    <section className="relative min-h-[100dvh] flex flex-col px-8 pt-[240px] md:pt-[260px] pb-20 md:pb-12 overflow-hidden justify-center">
+      <div className="max-w-7xl w-full mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <motion.div
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}

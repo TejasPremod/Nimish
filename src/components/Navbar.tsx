@@ -41,7 +41,7 @@ export const Navbar = () => {
             setIsMobileMenuOpen(false);
           }}
         >
-          <Logo className="w-24 md:w-32 group-hover:scale-105 transition-transform duration-500" />
+          <Logo className={cn("transition-all duration-500 group-hover:scale-105", isScrolled ? "w-12 md:w-20" : "w-20 md:w-28")} />
         </div>
 
         {/* Desktop Menu */}
