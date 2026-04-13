@@ -22,13 +22,19 @@ const Footer = () => (
       <div className="flex flex-col items-center md:items-start opacity-70 hover:opacity-100 transition-opacity">
         <Logo className="w-24" />
       </div>
+
+      <div className="flex flex-col items-center text-sm text-neutral-600">
+        <p className="font-semibold text-brand-burgundy mb-1">Contact</p>
+        <p>Abhishek B Nair</p>
+        <a href="tel:+919995488911" className="hover:text-brand-gold transition-colors font-mono">99954 88911</a>
+      </div>
       
       <div className="flex gap-8 text-sm font-medium text-neutral-500">
         <a href="https://www.instagram.com/nimishevents?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" className="hover:text-brand-burgundy transition-colors">Instagram</a>
         <a href="https://www.linkedin.com/company/nimish-live" target="_blank" rel="noopener noreferrer" className="hover:text-brand-burgundy transition-colors">LinkedIn</a>
       </div>
       
-      <p className="text-xs text-neutral-400 uppercase tracking-widest">
+      <p className="text-xs text-neutral-400 uppercase tracking-widest text-center md:text-left">
         © 2026 Nimish Event Architecture. All Rights Reserved.
       </p>
     </div>
