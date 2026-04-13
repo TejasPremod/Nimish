@@ -37,14 +37,15 @@ export const CTA = () => {
               Join the most exclusive network of event professionals and start planning your modern masterpiece today.
             </p>
             
-            <motion.button
+            <motion.a
+              href="#login"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-12 py-5 bg-brand-gold text-brand-burgundy font-bold text-lg rounded-sm shadow-xl hover:shadow-brand-gold/20 transition-all relative overflow-hidden group/btn"
+              className="px-12 py-5 bg-brand-gold text-brand-burgundy font-bold text-lg rounded-sm shadow-xl hover:shadow-brand-gold/20 transition-all relative overflow-hidden group/btn inline-block"
             >
               <span className="relative z-10">Get Started Now</span>
               <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300" />
-            </motion.button>
+            </motion.a>
           </div>
 
           {/* Decorative Corner Elements */}
