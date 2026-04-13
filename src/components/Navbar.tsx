@@ -7,11 +7,13 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/src/lib/utils";
 import { Logo } from "./Logo";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut } from "lucide-react";
+import { useAuth } from "../contexts/AuthContext";
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, signOut } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -21,7 +23,7 @@ export const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const navLinks = ["Services", "Portfolio", "About"];
+  const navLinks = ["Services", "Vendors", "Venues", "Portfolio", "About"];
 
   return (
     <>
@@ -58,20 +60,31 @@ export const Navbar = () => {
           ))}
         </div>
 
-        {/* Desktop Contact Button */}
-        <motion.a
-          href="tel:+919995488911"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="hidden md:block relative group px-8 py-3 bg-brand-burgundy text-brand-cream rounded-sm overflow-hidden"
-        >
-          <span className="relative z-10 font-medium">Contact</span>
-          {/* Border Beam / Glow Effect */}
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-brand-gold/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"
-          />
-          <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-brand-gold/10 blur-xl" />
-        </motion.a>
+        {/* Desktop Actions */}
+        <div className="hidden md:flex items-center gap-4">
+          {!user ? (
+            <a href="#login" className="text-sm font-medium text-brand-burgundy hover:text-brand-gold transition-colors block px-4">
+              Sign In
+            </a>
+          ) : (
+            <button onClick={signOut} className="text-sm font-medium text-brand-burgundy hover:text-red-600 transition-colors flex items-center gap-2 px-4 focus:outline-none">
+              <LogOut size={16} /> Sign Out
+            </button>
+          )}
+          <motion.a
+            href="tel:+919995488911"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="relative group px-8 py-3 bg-brand-burgundy text-brand-cream rounded-sm overflow-hidden"
+          >
+            <span className="relative z-10 font-medium">Contact</span>
+            {/* Border Beam / Glow Effect */}
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-brand-gold/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 ease-in-out"
+            />
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-brand-gold/10 blur-xl" />
+          </motion.a>
+        </div>
 
         {/* Mobile Menu Toggle Button */}
         <button 

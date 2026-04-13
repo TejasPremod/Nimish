@@ -15,6 +15,9 @@ import { Home } from "./components/Home";
 import { Vendors } from "./components/Vendors";
 import { Portfolio } from "./components/Portfolio";
 import { About } from "./components/About";
+import { Venues } from "./components/Venues";
+import { Auth } from "./components/Auth";
+import { useAuth } from "./contexts/AuthContext";
 
 const Footer = () => (
   <footer className="py-12 px-8 border-t border-brand-gold/10 bg-brand-cream">
@@ -43,6 +46,7 @@ const Footer = () => (
 
 export default function App() {
   const [hash, setHash] = useState(window.location.hash);
+  const { user } = useAuth();
 
   useEffect(() => {
     const onHashChange = () => setHash(window.location.hash);
@@ -51,9 +55,18 @@ export default function App() {
   }, []);
 
   const renderPage = () => {
+    if ((hash === "#vendors" || hash === "#venues") && !user) {
+      window.location.hash = "#login";
+      return null;
+    }
+
     switch (hash) {
+      case "#login":
+        return user ? <Home /> : <Auth />;
       case "#vendors":
         return <Vendors />;
+      case "#venues":
+        return <Venues />;
       case "#portfolio":
         return <Portfolio />;
       case "#about":

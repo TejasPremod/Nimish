@@ -1,36 +1,35 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { MapPin, Star, Heart } from "lucide-react";
+import { MapPin, Users, Heart } from "lucide-react";
 import { DirectoryLayout } from "./DirectoryLayout";
 import { cn } from "../lib/utils";
 
-const ALL_VENDORS = [
-  { id: 1, name: "The Grand Estate", type: "Venue", location: "Beverly Hills, CA", rating: 4.9, minPrice: 15000, image: "https://picsum.photos/seed/estate/600/400" },
-  { id: 2, name: "Lumina Florals", type: "Florist", location: "Los Angeles, CA", rating: 5.0, minPrice: 2500, image: "https://picsum.photos/seed/floral/600/400" },
-  { id: 3, name: "Culinary Canvas", type: "Catering", location: "Santa Monica, CA", rating: 4.8, minPrice: 5000, image: "https://picsum.photos/seed/catering/600/400" },
-  { id: 4, name: "Oceanside Pavilion", type: "Venue", location: "Malibu, CA", rating: 4.9, minPrice: 12000, image: "https://picsum.photos/seed/pavilion/600/400" },
-  { id: 5, name: "Rhythmic Beats", type: "Entertainment", location: "Hollywood, CA", rating: 4.7, minPrice: 1500, image: "https://picsum.photos/seed/dj/600/400" },
-  { id: 6, name: "Elegance Rentals", type: "Decor", location: "Pasadena, CA", rating: 4.9, minPrice: 3500, image: "https://picsum.photos/seed/decor/600/400" },
+const ALL_VENUES = [
+  { id: 1, name: "The Emerald Gardens", type: "Outdoor", location: "Santa Barbara, CA", capacity: 300, minPrice: 12000, image: "https://picsum.photos/seed/garden/600/400" },
+  { id: 2, name: "Skyline Penthouse", type: "Indoor", location: "Downtown LA", capacity: 150, minPrice: 8500, image: "https://picsum.photos/seed/penthouse/600/400" },
+  { id: 3, name: "Coastal Cliff Resort", type: "Resort", location: "Laguna Beach, CA", capacity: 250, minPrice: 18000, image: "https://picsum.photos/seed/cliff/600/400" },
+  { id: 4, name: "Vintage Winery", type: "Vineyard", location: "Napa Valley, CA", capacity: 400, minPrice: 22000, image: "https://picsum.photos/seed/winery/600/400" },
+  { id: 5, name: "The Crystal Ballroom", type: "Indoor", location: "Beverly Hills, CA", capacity: 500, minPrice: 25000, image: "https://picsum.photos/seed/ballroom/600/400" },
 ];
 
-const VENDOR_TYPES = ["Any", "Venue", "Florist", "Catering", "Entertainment", "Decor"];
+const VENUE_TYPES = ["Any", "Indoor", "Outdoor", "Resort", "Vineyard"];
 
-export const Vendors = () => {
+export const Venues = () => {
   const [selectedType, setSelectedType] = useState("Any");
-  const [priceRange, setPriceRange] = useState(20000);
+  const [capacity, setCapacity] = useState(100);
 
-  const filteredVendors = ALL_VENDORS.filter((vendor) => {
-    if (selectedType !== "Any" && vendor.type !== selectedType) return false;
-    if (vendor.minPrice > priceRange) return false;
+  const filteredVenues = ALL_VENUES.filter((venue) => {
+    if (selectedType !== "Any" && venue.type !== selectedType) return false;
+    if (venue.capacity < capacity) return false;
     return true;
   });
 
   const filters = (
     <>
       <div>
-        <h3 className="text-sm text-neutral-500 mb-3">Operating Type</h3>
+        <h3 className="text-sm text-neutral-500 mb-3">Venue Setting</h3>
         <div className="flex flex-wrap gap-2">
-          {VENDOR_TYPES.map((type) => (
+          {VENUE_TYPES.map((type) => (
             <button
               key={type}
               onClick={() => setSelectedType(type)}
@@ -49,20 +48,20 @@ export const Vendors = () => {
 
       <div>
         <div className="flex justify-between items-center mb-3">
-          <h3 className="text-sm text-neutral-500">Max Starting Price</h3>
+          <h3 className="text-sm text-neutral-500">Minimum Capacity</h3>
         </div>
         <input 
           type="range" 
-          min="1000" 
-          max="20000" 
-          step="500"
-          value={priceRange}
-          onChange={(e) => setPriceRange(Number(e.target.value))}
+          min="50" 
+          max="500" 
+          step="50"
+          value={capacity}
+          onChange={(e) => setCapacity(Number(e.target.value))}
           className="w-full accent-brand-gold"
         />
         <div className="flex justify-between text-xs text-neutral-400 mt-2">
-          <span>$0</span>
-          <span>${priceRange.toLocaleString()}</span>
+          <span>50 guests</span>
+          <span>{capacity}+ guests</span>
         </div>
       </div>
     </>
@@ -70,39 +69,39 @@ export const Vendors = () => {
 
   return (
     <DirectoryLayout 
-      title="Elite Vendors" 
-      subtitle="Discover our hand-selected network of master artisans who bring the Nimish vision to life."
+      title="Exclusive Venues" 
+      subtitle="Find the perfect architectural backdrop for your bespoke event."
       filters={filters}
-      resultsCount={filteredVendors.length}
+      resultsCount={filteredVenues.length}
     >
       <AnimatePresence mode="popLayout">
-        {filteredVendors.map((vendor, i) => (
+        {filteredVenues.map((venue, i) => (
           <motion.div
             layout
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.3, delay: i * 0.05 }}
-            key={vendor.id}
+            key={venue.id}
             className="group flex flex-col md:flex-row bg-white rounded-sm border border-neutral-200 overflow-hidden shadow-sm hover:shadow-xl hover:border-brand-gold/30 transition-all duration-300"
           >
             {/* Image Section */}
             <div className="relative w-full md:w-72 h-48 md:h-auto overflow-hidden flex-shrink-0">
               <img 
-                src={vendor.image} 
-                alt={vendor.name} 
+                src={venue.image} 
+                alt={venue.name} 
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
                 referrerPolicy="no-referrer"
               />
               <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-[10px] font-bold tracking-wider uppercase text-brand-burgundy shadow-sm">
-                {vendor.type}
+                {venue.type}
               </div>
             </div>
 
             {/* Content Section */}
             <div className="p-5 flex flex-col flex-grow">
               <div className="flex justify-between items-start mb-2">
-                <h3 className="text-2xl font-serif text-brand-burgundy group-hover:text-brand-gold transition-colors">{vendor.name}</h3>
+                <h3 className="text-2xl font-serif text-brand-burgundy group-hover:text-brand-gold transition-colors">{venue.name}</h3>
                 <button className="text-neutral-300 hover:text-red-500 transition-colors">
                   <Heart className="w-5 h-5" />
                 </button>
@@ -111,21 +110,20 @@ export const Vendors = () => {
               <div className="flex items-center gap-4 text-sm text-neutral-500 mb-4">
                 <div className="flex items-center gap-1">
                   <MapPin className="w-4 h-4 text-brand-gold" />
-                  <span>{vendor.location}</span>
+                  <span>{venue.location}</span>
                 </div>
               </div>
 
               <div className="flex items-center gap-2 mb-4">
-                <div className="flex items-center gap-1 bg-brand-gold/10 text-brand-burgundy px-2 py-0.5 rounded text-xs font-bold font-mono">
-                  {vendor.rating} <Star className="w-3 h-3 fill-current inline-block pb-0.5" />
+                <div className="flex items-center gap-1 bg-neutral-100 text-neutral-600 px-2 py-0.5 rounded text-xs">
+                  <Users className="w-3 h-3" /> Up to {venue.capacity}
                 </div>
-                <span className="text-xs text-neutral-400">(Selected Partner)</span>
               </div>
 
               <div className="mt-auto pt-4 border-t border-neutral-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                   <span className="text-xs text-neutral-400 block">Starting from</span>
-                  <span className="text-lg font-mono font-bold text-neutral-800">${vendor.minPrice.toLocaleString()}</span>
+                  <span className="text-lg font-mono font-bold text-neutral-800">${venue.minPrice.toLocaleString()}</span>
                 </div>
                 <button className="px-5 py-2 border border-brand-burgundy text-brand-burgundy hover:bg-brand-burgundy hover:text-white transition-colors text-sm font-medium rounded-sm">
                   View Details
@@ -135,9 +133,9 @@ export const Vendors = () => {
           </motion.div>
         ))}
       </AnimatePresence>
-      {filteredVendors.length === 0 && (
+      {filteredVenues.length === 0 && (
         <div className="text-center py-20 text-neutral-500">
-          No vendors found matching your filters.
+          No venues found matching your capacity requirements.
         </div>
       )}
     </DirectoryLayout>
