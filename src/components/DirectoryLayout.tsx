@@ -36,7 +36,7 @@ export const DirectoryLayout = ({ title, subtitle, filters, children, resultsCou
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="w-full lg:w-72 flex-shrink-0 bg-white border border-neutral-200 rounded-sm shadow-sm sticky top-28"
+          className="w-full lg:w-72 flex-shrink-0 bg-white border border-neutral-200 rounded-sm shadow-sm lg:sticky lg:top-28 relative z-20"
         >
           <div className="p-5 border-b border-neutral-100">
             <h2 className="text-lg font-bold text-neutral-800">Filters</h2>
