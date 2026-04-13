@@ -46,7 +46,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: window.location.origin + window.location.pathname + "#home"
+          queryParams: {
+            prompt: 'select_account'
+          },
+          redirectTo: window.location.origin + window.location.pathname
         }
       });
       if (error) console.error("Error logging in:", error.message);
@@ -56,8 +59,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
-    window.location.hash = "#home";
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      console.error("Error signing out:", error.message);
+    }
+    // Clear URL hash to ensure clean state
+    window.location.hash = "";
   };
 
   return (
