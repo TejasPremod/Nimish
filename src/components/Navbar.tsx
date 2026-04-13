@@ -116,6 +116,26 @@ export const Navbar = () => {
                 </a>
               ))}
               
+              {!user ? (
+                <a 
+                  href="#login" 
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="text-3xl font-serif text-brand-gold hover:text-brand-burgundy transition-colors mt-4"
+                >
+                  Sign In
+                </a>
+              ) : (
+                <button 
+                  onClick={() => {
+                    signOut();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="text-3xl font-serif text-red-600 hover:text-red-700 transition-colors mt-4 flex items-center gap-3"
+                >
+                  <LogOut size={28} /> Sign Out
+                </button>
+              )}
+
               <div className="w-full h-px bg-brand-gold/20 my-4" />
               
               <div className="flex flex-col items-center text-center gap-2">
