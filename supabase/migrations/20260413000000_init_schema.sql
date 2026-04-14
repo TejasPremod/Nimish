@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS vendors (
     rating DECIMAL(2,1) NOT NULL,
     min_price INT NOT NULL,
     image VARCHAR(1000) NOT NULL,
+    experience_years INT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
@@ -42,13 +43,15 @@ CREATE POLICY "Enable read access for authenticated users only" ON venues
     USING (true);
 
 -- Insert Dummy Data for Vendors
-INSERT INTO vendors (name, type, location, rating, min_price, image) VALUES
-('The Grand Estate', 'Venue', 'Beverly Hills, CA', 4.9, 15000, 'https://picsum.photos/seed/estate/600/400'),
-('Lumina Florals', 'Florist', 'Los Angeles, CA', 5.0, 2500, 'https://picsum.photos/seed/floral/600/400'),
-('Culinary Canvas', 'Catering', 'Santa Monica, CA', 4.8, 5000, 'https://picsum.photos/seed/catering/600/400'),
-('Oceanside Pavilion', 'Venue', 'Malibu, CA', 4.9, 12000, 'https://picsum.photos/seed/pavilion/600/400'),
-('Rhythmic Beats', 'Entertainment', 'Hollywood, CA', 4.7, 1500, 'https://picsum.photos/seed/dj/600/400'),
-('Elegance Rentals', 'Decor', 'Pasadena, CA', 4.9, 3500, 'https://picsum.photos/seed/decor/600/400')
+INSERT INTO vendors (name, type, location, rating, min_price, image, experience_years) VALUES
+('The Grand Estate', 'Venue', 'Beverly Hills, CA', 4.9, 15000, 'https://picsum.photos/seed/estate/600/400', NULL),
+('Lumina Florals', 'Florist', 'Los Angeles, CA', 5.0, 2500, 'https://picsum.photos/seed/floral/600/400', NULL),
+('Culinary Canvas', 'Catering', 'Santa Monica, CA', 4.8, 5000, 'https://picsum.photos/seed/catering/600/400', NULL),
+('Oceanside Pavilion', 'Venue', 'Malibu, CA', 4.9, 12000, 'https://picsum.photos/seed/pavilion/600/400', NULL),
+('Rhythmic Beats', 'Entertainment', 'Hollywood, CA', 4.7, 1500, 'https://picsum.photos/seed/dj/600/400', NULL),
+('Elegance Rentals', 'Decor', 'Pasadena, CA', 4.9, 3500, 'https://picsum.photos/seed/decor/600/400', NULL),
+('Fenix Beauty Parlour', 'Salon & Makeover', 'Trivandrum', 5.0, 20000, 'https://picsum.photos/seed/salon/600/400', 8),
+('NIRMAL Phorgraphy', 'Photography & Video', 'All Kerala & Bangalore,Delhi', 5.0, 3500, 'https://picsum.photos/seed/photography/600/400', 9)
 ON CONFLICT DO NOTHING;
 
 -- Insert Dummy Data for Venues

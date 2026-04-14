@@ -13,9 +13,10 @@ interface Vendor {
   rating: number;
   min_price: number;
   image: string;
+  experience_years?: number;
 }
 
-const VENDOR_TYPES = ["Any", "Venue", "Florist", "Catering", "Entertainment", "Decor"];
+const VENDOR_TYPES = ["Any", "Venue", "Florist", "Catering", "Entertainment", "Decor", "Salon & Makeover", "Photography & Video"];
 
 export const Vendors = () => {
   const [vendors, setVendors] = useState<Vendor[]>([]);
@@ -146,6 +147,13 @@ export const Vendors = () => {
                     <MapPin className="w-4 h-4 text-brand-gold" />
                     <span>{vendor.location}</span>
                   </div>
+                  {vendor.experience_years && (
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs bg-neutral-100 px-2 py-0.5 rounded text-neutral-600">
+                        {vendor.experience_years} Years Exp.
+                      </span>
+                    </div>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-2 mb-4">
