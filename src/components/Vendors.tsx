@@ -4,6 +4,7 @@ import { MapPin, Star, Heart } from "lucide-react";
 import { DirectoryLayout } from "./DirectoryLayout";
 import { cn } from "../lib/utils";
 import { supabase } from "../lib/supabase";
+import { VendorModal } from "./VendorModal";
 
 interface Vendor {
   id: number;
@@ -23,6 +24,7 @@ export const Vendors = () => {
   const [loading, setLoading] = useState(true);
   const [selectedType, setSelectedType] = useState("Any");
   const [priceRange, setPriceRange] = useState(20000);
+  const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
 
   useEffect(() => {
     const fetchVendors = async () => {
@@ -168,7 +170,9 @@ export const Vendors = () => {
                     <span className="text-xs text-neutral-400 block">Starting from</span>
                     <span className="text-lg font-mono font-bold text-neutral-800">₹{vendor.min_price.toLocaleString()}</span>
                   </div>
-                  <button className="px-5 py-2 border border-brand-burgundy text-brand-burgundy hover:bg-brand-burgundy hover:text-white transition-colors text-sm font-medium rounded-sm">
+                  <button 
+                    onClick={() => setSelectedVendor(vendor)}
+                    className="px-5 py-2 border border-brand-burgundy text-brand-burgundy hover:bg-brand-burgundy hover:text-white transition-colors text-sm font-medium rounded-sm">
                     View Details
                   </button>
                 </div>
@@ -183,6 +187,15 @@ export const Vendors = () => {
           No vendors found matching your filters.
         </div>
       )}
+
+      <AnimatePresence>
+        {selectedVendor && (
+          <VendorModal 
+            vendor={selectedVendor} 
+            onClose={() => setSelectedVendor(null)} 
+          />
+        )}
+      </AnimatePresence>
     </DirectoryLayout>
   );
 };
