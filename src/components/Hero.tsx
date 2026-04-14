@@ -5,6 +5,7 @@
 
 import { motion } from "motion/react";
 import { ArrowRight } from "lucide-react";
+import heroBg from '../assets/pexels-photo-10282581.jpeg';
 
 export const Hero = () => {
   return (
@@ -82,7 +83,7 @@ export const Hero = () => {
 
           <div className="w-full h-full overflow-hidden rounded-sm shadow-2xl relative group">
             <img
-              src="/pexels-photo-10282581.jpeg"
+              src={heroBg}
               alt="Modern Event Design"
               className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
               referrerPolicy="no-referrer"
