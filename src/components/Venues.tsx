@@ -157,7 +157,7 @@ export const Venues = () => {
                 <div className="mt-auto pt-4 border-t border-neutral-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                   <div>
                     <span className="text-xs text-neutral-400 block">Starting from</span>
-                    <span className="text-lg font-mono font-bold text-neutral-800">${venue.min_price.toLocaleString()}</span>
+                    <span className="text-lg font-mono font-bold text-neutral-800">₹{venue.min_price.toLocaleString()}</span>
                   </div>
                   <button className="px-5 py-2 border border-brand-burgundy text-brand-burgundy hover:bg-brand-burgundy hover:text-white transition-colors text-sm font-medium rounded-sm">
                     View Details
