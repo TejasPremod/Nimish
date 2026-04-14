@@ -21,13 +21,15 @@ interface VendorModalProps {
 export const VendorModal = ({ vendor, onClose }: VendorModalProps) => {
   const galleryRef = useRef<HTMLDivElement>(null);
 
-  const galleryImages = [
-    "https://tydiuhvytofiedapxpjh.supabase.co/storage/v1/object/public/images/WhatsApp%20Image%202026-04-14%20at%2016.18.32.jpeg",
-    "https://tydiuhvytofiedapxpjh.supabase.co/storage/v1/object/public/images/WhatsApp%20Image%202026-04-14%20at%2016.18.33.jpeg",
-    "https://tydiuhvytofiedapxpjh.supabase.co/storage/v1/object/public/images/WhatsApp%20Image%202026-04-14%20at%2016.18.37.jpeg",
-    "https://tydiuhvytofiedapxpjh.supabase.co/storage/v1/object/public/images/WhatsApp%20Image%202026-04-14%20at%2016.18.44.jpeg",
-    "https://tydiuhvytofiedapxpjh.supabase.co/storage/v1/object/public/images/WhatsApp%20Image%202026-04-14%20at%2016.18.49.jpeg"
-  ];
+  const galleryImages = vendor.name.toUpperCase().includes("NIRMAL")
+    ? [
+        "https://tydiuhvytofiedapxpjh.supabase.co/storage/v1/object/public/images/WhatsApp%20Image%202026-04-14%20at%2016.18.32.jpeg",
+        "https://tydiuhvytofiedapxpjh.supabase.co/storage/v1/object/public/images/WhatsApp%20Image%202026-04-14%20at%2016.18.33.jpeg",
+        "https://tydiuhvytofiedapxpjh.supabase.co/storage/v1/object/public/images/WhatsApp%20Image%202026-04-14%20at%2016.18.37.jpeg",
+        "https://tydiuhvytofiedapxpjh.supabase.co/storage/v1/object/public/images/WhatsApp%20Image%202026-04-14%20at%2016.18.44.jpeg",
+        "https://tydiuhvytofiedapxpjh.supabase.co/storage/v1/object/public/images/WhatsApp%20Image%202026-04-14%20at%2016.18.49.jpeg"
+      ]
+    : Array.from({ length: 4 }).map((_, i) => `https://picsum.photos/seed/vendor-${vendor.id}-${i}/800/1000`);
 
   const scrollGallery = (direction: 'left' | 'right') => {
     if (galleryRef.current) {
