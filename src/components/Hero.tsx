@@ -42,7 +42,7 @@ export const Hero = () => {
             transition={{ delay: 0.6, duration: 0.8 }}
             className="text-xl text-neutral-600 max-w-md leading-relaxed"
           >
-            Sleek. Sophisticated. Unique Experiences Crafted to Perfection. 
+            Sleek. Sophisticated. Unique Experiences Crafted to Perfection.
             We turn your vision into a modern masterpiece.
           </motion.p>
 
@@ -62,7 +62,7 @@ export const Hero = () => {
               <ArrowRight className="w-5 h-5 relative z-10 group-hover:translate-x-1 transition-transform" />
               <div className="absolute inset-0 bg-brand-gold/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
             </motion.button>
-            <button 
+            <button
               onClick={() => window.location.hash = "#portfolio"}
               className="text-brand-burgundy font-medium text-lg border-b-2 border-brand-gold/30 hover:border-brand-gold transition-all py-1 cursor-pointer">
               View Portfolio
@@ -79,10 +79,10 @@ export const Hero = () => {
           {/* Decorative Gold Frames */}
           <div className="absolute -top-8 -left-8 w-full h-full border border-brand-gold/20 -z-10" />
           <div className="absolute -bottom-8 -right-8 w-full h-full border border-brand-gold/20 -z-10" />
-          
+
           <div className="w-full h-full overflow-hidden rounded-sm shadow-2xl relative group">
             <img
-              src="https://picsum.photos/seed/wedding-minimal/1200/1500"
+              src="/pexels-photo-10282581.jpeg"
               alt="Modern Event Design"
               className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
               referrerPolicy="no-referrer"
@@ -94,6 +94,7 @@ export const Hero = () => {
           <motion.div
             animate={{ y: [0, -10, 0] }}
             transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+            style={{ willChange: "transform" }}
             className="absolute -bottom-6 -left-6 bg-white p-6 shadow-xl rounded-sm border border-brand-gold/10"
           >
             <div className="flex flex-col gap-1">

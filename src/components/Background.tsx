@@ -10,7 +10,9 @@ export const Background = () => {
   const [particles, setParticles] = useState<{ id: number; x: number; y: number; size: number; duration: number }[]>([]);
 
   useEffect(() => {
-    const newParticles = Array.from({ length: 20 }).map((_, i) => ({
+    const isMobile = window.innerWidth < 768;
+    const particleCount = isMobile ? 6 : 20;
+    const newParticles = Array.from({ length: particleCount }).map((_, i) => ({
       id: i,
       x: Math.random() * 100,
       y: Math.random() * 100,
@@ -36,7 +38,8 @@ export const Background = () => {
           repeat: Infinity,
           ease: "linear",
         }}
-        className="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] rounded-full bg-brand-gold/10 blur-[120px]"
+        style={{ willChange: "transform, opacity" }}
+        className="absolute -top-[20%] -left-[10%] w-[70%] h-[70%] rounded-full bg-brand-gold/10 blur-[40px] md:blur-[120px]"
       />
       <motion.div
         animate={{
@@ -50,7 +53,8 @@ export const Background = () => {
           repeat: Infinity,
           ease: "linear",
         }}
-        className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-brand-burgundy/5 blur-[100px]"
+        style={{ willChange: "transform, opacity" }}
+        className="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-brand-burgundy/5 blur-[40px] md:blur-[100px]"
       />
 
       {/* Grid Shimmer */}
@@ -76,6 +80,7 @@ export const Background = () => {
           style={{
             width: p.size,
             height: p.size,
+            willChange: "transform, opacity",
           }}
           className="absolute bg-brand-gold rounded-full"
         />
@@ -91,7 +96,8 @@ export const Background = () => {
           repeat: Infinity,
           ease: "linear",
         }}
-        className="absolute top-1/4 left-1/4 w-[400px] h-[400px] border border-brand-gold/5 rounded-full pointer-events-none"
+        style={{ willChange: "transform" }}
+        className="absolute top-1/4 left-1/4 w-[400px] h-[400px] border border-brand-gold/5 rounded-full pointer-events-none hidden md:block"
       />
       <motion.div
         animate={{
@@ -102,7 +108,8 @@ export const Background = () => {
           repeat: Infinity,
           ease: "linear",
         }}
-        className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] border border-brand-burgundy/5 rounded-full pointer-events-none"
+        style={{ willChange: "transform" }}
+        className="absolute bottom-1/4 right-1/4 w-[600px] h-[600px] border border-brand-burgundy/5 rounded-full pointer-events-none hidden md:block"
       />
     </div>
   );
