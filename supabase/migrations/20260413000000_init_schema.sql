@@ -51,7 +51,7 @@ INSERT INTO vendors (name, type, location, rating, min_price, image, experience_
 ('Rhythmic Beats', 'Entertainment', 'Hollywood, CA', 4.7, 1500, 'https://picsum.photos/seed/dj/600/400', NULL),
 ('Elegance Rentals', 'Decor', 'Pasadena, CA', 4.9, 3500, 'https://picsum.photos/seed/decor/600/400', NULL),
 ('Fenix Beauty Parlour', 'Salon & Makeover', 'Trivandrum', 5.0, 20000, 'https://picsum.photos/seed/salon/600/400', 8),
-('NIRMAL Phorgraphy', 'Photography & Video', 'All Kerala & Bangalore,Delhi', 5.0, 3500, 'https://picsum.photos/seed/photography/600/400', 9)
+('NIRMAL Photography', 'Photography & Video', 'All Kerala & Bangalore,Delhi', 5.0, 3500, 'https://picsum.photos/seed/photography/600/400', 9)
 ON CONFLICT DO NOTHING;
 
 -- Insert Dummy Data for Venues
