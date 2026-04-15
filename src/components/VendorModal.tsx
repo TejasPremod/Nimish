@@ -1,6 +1,10 @@
-import { motion } from "motion/react";
-import { X, MapPin, Star, Heart, CheckCircle2, ChevronRight, ChevronLeft } from "lucide-react";
-import { useRef } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { X, MapPin, Star, Heart, CheckCircle2, ChevronRight, ChevronLeft, Calendar as CalendarIcon } from "lucide-react";
+import { useRef, useState, useEffect } from "react";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/dist/style.css";
+import { supabase } from "../lib/supabase";
+import { BookingPaymentModal } from "./BookingPaymentModal";
 
 interface Vendor {
   id: number;
@@ -20,6 +24,46 @@ interface VendorModalProps {
 
 export const VendorModal = ({ vendor, onClose }: VendorModalProps) => {
   const galleryRef = useRef<HTMLDivElement>(null);
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [bookings, setBookings] = useState<any[]>([]);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+
+  useEffect(() => {
+    if (showCalendar) {
+      const fetchBookings = async () => {
+        const { data } = await supabase
+          .from('bookings')
+          .select('*')
+          .eq('vendor_id', vendor.id);
+        if (data) setBookings(data);
+      };
+      fetchBookings();
+    }
+  }, [showCalendar, vendor.id]);
+
+  const bookedDates = bookings.filter(b => b.status === "confirmed").map(b => new Date(b.booking_date));
+  const pendingDates = bookings.filter(b => b.status === "pending").map(b => new Date(b.booking_date));
+
+  const modifiers = {
+    booked: bookedDates,
+    pending: pendingDates,
+  };
+  
+  const modifiersStyles = {
+    booked: { color: 'white', backgroundColor: '#ef4444' }, // Red
+    pending: { color: 'black', backgroundColor: '#facc15' }, // Yellow
+  };
+
+  const isDateBooked = (date: Date) => {
+    // Check if the date corresponds exactly to a booked/pending date ignoring hours
+    return bookings.some(b => {
+       const bDate = new Date(b.booking_date);
+       return bDate.getFullYear() === date.getFullYear() && 
+              bDate.getMonth() === date.getMonth() && 
+              bDate.getDate() === date.getDate();
+    });
+  };
 
   const galleryImages = vendor.name.toUpperCase().includes("NIRMAL")
     ? [
@@ -212,12 +256,96 @@ export const VendorModal = ({ vendor, onClose }: VendorModalProps) => {
               <div className="text-sm text-neutral-500">Require an inquiry?</div>
               <div className="font-medium text-brand-burgundy">Response usually within 24 hours</div>
             </div>
-            <button className="w-full md:w-auto px-8 py-3 bg-brand-burgundy text-brand-cream rounded-sm font-medium hover:bg-brand-burgundy/90 transition-colors shadow-lg">
-              Check Availability
-            </button>
+            {!showCalendar ? (
+              <button 
+                onClick={() => setShowCalendar(true)}
+                className="w-full md:w-auto px-8 py-3 bg-brand-burgundy text-brand-cream rounded-sm font-medium hover:bg-brand-burgundy/90 transition-colors shadow-lg flex items-center gap-2 justify-center"
+              >
+                <CalendarIcon className="w-4 h-4" />
+                Check Availability
+              </button>
+            ) : (
+              <button 
+                onClick={() => setShowCalendar(false)}
+                className="w-full md:w-auto px-8 py-3 border border-neutral-300 text-neutral-600 rounded-sm font-medium hover:bg-neutral-50 transition-colors"
+              >
+                Hide Calendar
+              </button>
+            )}
           </div>
+          
+          {/* Calendar View */}
+          <AnimatePresence>
+            {showCalendar && (
+              <motion.div 
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="bg-neutral-50 border-t border-neutral-200 p-6 flex flex-col md:flex-row gap-8 overflow-hidden rounded-b-xl"
+              >
+                <div className="flex-1 bg-white p-4 rounded-lg shadow-sm border border-neutral-100 flex justify-center">
+                  <style>{`
+                    .rdp {
+                      --rdp-cell-size: 40px;
+                      --rdp-accent-color: #581622;
+                      --rdp-background-color: #fce7f3;
+                    }
+                    .rdp-day_selected:not([disabled]), .rdp-day_selected:focus:not([disabled]), .rdp-day_selected:active:not([disabled]), .rdp-day_selected:hover:not([disabled]) {
+                      background-color: #16a34a; /* Green for selected */
+                      color: white;
+                    }
+                  `}</style>
+                  <DayPicker 
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={setSelectedDate}
+                    modifiers={modifiers}
+                    modifiersStyles={modifiersStyles}
+                    disabled={[{ before: new Date() }, isDateBooked]}
+                  />
+                </div>
+                <div className="flex-[2] flex flex-col justify-center">
+                  <h4 className="text-xl font-serif text-brand-burgundy mb-4">Availability status</h4>
+                  <div className="flex gap-4 mb-6">
+                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-green-600"></div><span className="text-sm text-neutral-600">Free</span></div>
+                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-yellow-400"></div><span className="text-sm text-neutral-600">Pending</span></div>
+                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-red-500"></div><span className="text-sm text-neutral-600">Booked</span></div>
+                  </div>
+                  
+                  {selectedDate ? (
+                    <div className="bg-white p-4 rounded-lg border border-brand-gold/30 shadow-sm animate-in fade-in slide-in-from-bottom-4">
+                      <p className="text-sm text-neutral-500 mb-1">Selected Date:</p>
+                      <p className="font-medium text-brand-burgundy mb-4">{selectedDate.toDateString()}</p>
+                      <button 
+                        onClick={() => setShowPaymentModal(true)}
+                        className="w-full py-3 bg-brand-gold text-neutral-900 font-medium rounded-sm hover:bg-yellow-500 transition-colors shadow-sm"
+                      >
+                        Request Booking & Pay in Escrow (₹{vendor.min_price.toLocaleString()})
+                      </button>
+                    </div>
+                  ) : (
+                    <p className="text-neutral-500 italic">Select a green date on the calendar to proceed with booking.</p>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
       </motion.div>
+
+      {showPaymentModal && selectedDate && (
+        <BookingPaymentModal 
+          vendorId={vendor.id}
+          date={selectedDate}
+          amount={vendor.min_price}
+          onClose={() => setShowPaymentModal(false)}
+          onSuccess={() => {
+            setShowPaymentModal(false);
+            setShowCalendar(false); 
+            setTimeout(() => setShowCalendar(true), 100);
+          }}
+        />
+      )}
     </>
   );
 };
