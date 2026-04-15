@@ -19,59 +19,82 @@ export const BookingPaymentModal = ({ entityId, entityType, date, amount, onClos
   const handlePayment = async () => {
     setLoading(true);
     setStep("processing");
-    
-    // Simulate Razorpay Gateway Interaction
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    
+
     try {
-      // In a real scenario, this happens to create the order:
-      // const { data: orderData } = await supabase.functions.invoke('create-razorpay-order', { body: { amount } });
+      // 1. Call your Supabase Edge Function to create an Order
+      const { data: orderData, error: orderError } = await supabase.functions.invoke('create-razorpay-order', { 
+        body: { amount } 
+      });
       
-      // Since we don't have the backend active, we'll insert a dummy booking simulating the result
-      const { data: userResponse } = await supabase.auth.getUser();
-      const user = userResponse.user;
-      
-      if (!user) {
-        alert("Please login first to book.");
-        onClose();
-        return;
-      }
-      
-      // Simulate booking insertion
-      const { data: booking, error: bookingError } = await supabase
-        .from('bookings')
-        .insert({
-          user_id: user.id,
-          vendor_id: entityType === 'vendor' ? entityId : null,
-          venue_id: entityType === 'venue' ? entityId : null,
-          booking_date: date.toISOString().split('T')[0],
-          total_amount: amount,
-          status: 'pending' // Yellow state (Escrow held)
-        })
-        .select()
-        .single();
-        
-      if (bookingError) throw bookingError;
+      if (orderError) throw new Error("Failed to create Razorpay Order");
 
-      // Simulate Escrow transaction logic
-      const { error: escrowError } = await supabase
-        .from('escrow_transactions')
-        .insert({
-          booking_id: booking.id,
-          amount: amount,
-          razorpay_order_id: `ord_dummy_${Math.random().toString(36).substring(7)}`,
-          razorpay_payment_id: `pay_dummy_${Math.random().toString(36).substring(7)}`,
-          status: 'held_in_escrow'
-        });
+      // 2. Open the Razorpay Popup
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID, // Use an env variable here!
+        amount: orderData.amount,
+        currency: "INR",
+        name: "Nimish Event Architecture",
+        description: "Escrow Deposit",
+        order_id: orderData.id,
+        handler: async function (response: any) {
+          // 3. THIS RUNS AFTER SUCCESSFUL PAYMENT!
+          const { data: userResponse } = await supabase.auth.getUser();
+          const user = userResponse.user;
+          
+          if (!user) {
+            alert("Please login first to book.");
+            onClose();
+            return;
+          }
+          
+          // Real booking insertion
+          const { data: booking, error: bookingError } = await supabase
+            .from('bookings')
+            .insert({
+              user_id: user.id,
+              vendor_id: entityType === 'vendor' ? entityId : null,
+              venue_id: entityType === 'venue' ? entityId : null,
+              booking_date: date.toISOString().split('T')[0],
+              total_amount: amount,
+              status: 'pending' // Yellow state (Escrow held)
+            })
+            .select()
+            .single();
+            
+          if (bookingError) {
+            console.error(bookingError);
+            alert("Failed to insert booking. Payment was successful.");
+            return;
+          }
 
-      if (escrowError) throw escrowError;
-      
-      setStep("success");
-      
-      // Wait to let user see success, then close
-      setTimeout(() => {
-        onSuccess();
-      }, 2500);
+          // Escrow transaction logic
+          const { error: escrowError } = await supabase
+            .from('escrow_transactions')
+            .insert({
+              booking_id: booking.id,
+              amount: amount,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              status: 'held_in_escrow'
+            });
+
+          if (escrowError) {
+             console.error(escrowError);
+             alert("Failed to log escrow transaction.");
+          }
+          
+          setStep("success");
+          
+          // Wait to let user see success, then close
+          setTimeout(() => {
+            onSuccess();
+          }, 2500);
+        },
+        theme: { color: "#5F1A21" } // Brand Burgundy
+      };
+
+      const razorpayForm = new (window as any).Razorpay(options);
+      razorpayForm.open();
 
     } catch (error) {
       console.error("Payment flow error:", error);
