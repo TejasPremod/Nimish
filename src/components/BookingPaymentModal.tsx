@@ -15,8 +15,10 @@ interface BookingPaymentModalProps {
 export const BookingPaymentModal = ({ entityId, entityType, date, amount, onClose, onSuccess }: BookingPaymentModalProps) => {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<"details" | "processing" | "success">("details");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handlePayment = async () => {
+    setErrorMsg(null);
     setLoading(true);
     setStep("processing");
 
@@ -26,9 +28,7 @@ export const BookingPaymentModal = ({ entityId, entityType, date, amount, onClos
       const user = userResponse.user;
       
       if (!user) {
-        alert("Please login first to book.");
-        onClose();
-        return;
+        throw new Error("Please login first to book.");
       }
 
       // 1. Call your Supabase Edge Function to create an Order
@@ -54,7 +54,7 @@ export const BookingPaymentModal = ({ entityId, entityType, date, amount, onClos
           }
         }
         
-        throw new Error(`Edge Function Failed: ${errorDetails}`);
+        throw new Error(errorDetails);
       }
 
       // 2. Open the Razorpay Popup
@@ -67,60 +67,72 @@ export const BookingPaymentModal = ({ entityId, entityType, date, amount, onClos
         order_id: orderData.id,
         handler: async function (response: any) {
           // 3. THIS RUNS AFTER SUCCESSFUL PAYMENT!
-          // Real booking insertion
-          const { data: booking, error: bookingError } = await supabase
-            .from('bookings')
-            .insert({
-              user_id: user.id,
-              vendor_id: entityType === 'vendor' ? entityId : null,
-              venue_id: entityType === 'venue' ? entityId : null,
-              booking_date: date.toISOString().split('T')[0],
-              total_amount: amount,
-              status: 'pending' // Yellow state (Escrow held)
-            })
-            .select()
-            .single();
+          try {
+            // Real booking insertion
+            const { data: booking, error: bookingError } = await supabase
+              .from('bookings')
+              .insert({
+                user_id: user.id,
+                vendor_id: entityType === 'vendor' ? entityId : null,
+                venue_id: entityType === 'venue' ? entityId : null,
+                booking_date: date.toISOString().split('T')[0],
+                total_amount: amount,
+                status: 'pending' // Yellow state (Escrow held)
+              })
+              .select()
+              .single();
+              
+            if (bookingError) throw bookingError;
+
+            // Escrow transaction logic
+            const { error: escrowError } = await supabase
+              .from('escrow_transactions')
+              .insert({
+                booking_id: booking.id,
+                amount: amount,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                status: 'held_in_escrow'
+              });
+
+            if (escrowError) throw escrowError;
             
-          if (bookingError) {
-            console.error(bookingError);
-            alert("Failed to insert booking. Payment was successful.");
-            return;
+            setStep("success");
+            
+            // Wait to let user see success, then close
+            setTimeout(() => {
+              onSuccess();
+            }, 2500);
+          } catch (err: any) {
+            console.error(err);
+            setStep("details");
+            setErrorMsg("Payment was successful, but failed to securely log the booking. Please contact support.");
           }
-
-          // Escrow transaction logic
-          const { error: escrowError } = await supabase
-            .from('escrow_transactions')
-            .insert({
-              booking_id: booking.id,
-              amount: amount,
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              status: 'held_in_escrow'
-            });
-
-          if (escrowError) {
-             console.error(escrowError);
-             alert("Failed to log escrow transaction.");
+        },
+        modal: {
+          ondismiss: function() {
+            setStep("details");
+            setErrorMsg("The payment was cancelled.");
+            setLoading(false);
           }
-          
-          setStep("success");
-          
-          // Wait to let user see success, then close
-          setTimeout(() => {
-            onSuccess();
-          }, 2500);
         },
         theme: { color: "#5F1A21" } // Brand Burgundy
       };
 
       const razorpayForm = new (window as any).Razorpay(options);
+      
+      razorpayForm.on('payment.failed', function (response: any) {
+        setStep("details");
+        setErrorMsg(`Payment failed: ${response.error.description}`);
+        setLoading(false);
+      });
+
       razorpayForm.open();
 
     } catch (error: any) {
       console.error("Payment flow error:", error);
-      alert(`Failed to process payment: ${error?.message || error || "Unknown error"}. Please check the console for more details.`);
+      setErrorMsg(error?.message || error || "Unknown error");
       setStep("details");
-    } finally {
       setLoading(false);
     }
   };
@@ -148,6 +160,17 @@ export const BookingPaymentModal = ({ entityId, entityType, date, amount, onClos
             </div>
             
             <div className="p-6">
+              {errorMsg && (
+                <motion.div 
+                  initial={{ opacity: 0, y: -10 }} 
+                  animate={{ opacity: 1, y: 0 }} 
+                  className="bg-red-50 border border-red-200 text-red-700 text-sm p-4 rounded-md mb-6 flex items-start gap-2"
+                >
+                  <X className="w-4 h-4 shrink-0 mt-0.5" />
+                  <p>{errorMsg}</p>
+                </motion.div>
+              )}
+              
               <div className="bg-neutral-50 border border-neutral-100 rounded-lg p-4 mb-6">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-neutral-500 text-sm">Booking Date</span>
