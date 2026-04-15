@@ -32,33 +32,48 @@ export const Vendors = () => {
   const { user } = useAuth();
 
   useEffect(() => {
+    let isMounted = true;
+    
     const fetchVendors = async () => {
       try {
+        setLoading(true);
         const { data, error } = await supabase
           .from("vendors")
           .select("*")
           .order("id");
           
-        if (error) throw error;
-        if (data) setVendors(data);
+        if (error) {
+          throw error;
+        }
+        
+        if (isMounted && data) {
+          setVendors(data);
+        }
       } catch (err) {
         console.error("Error fetching vendors:", err);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
     
     fetchVendors();
-  }, []);
 
-  useEffect(() => {
     const handler = (e: any) => {
-      const v = vendors.find(ven => ven.id === e.detail);
-      if (v) setSelectedVendor(v);
+      setVendors((currentVendors) => {
+        const v = currentVendors.find(ven => ven.id === e.detail);
+        if (v) setSelectedVendor(v);
+        return currentVendors;
+      });
     };
     window.addEventListener('open-vendor-modal', handler);
-    return () => window.removeEventListener('open-vendor-modal', handler);
-  }, [vendors]);
+    
+    return () => {
+      isMounted = false;
+      window.removeEventListener('open-vendor-modal', handler);
+    };
+  }, []);
 
   const filteredVendors = vendors.filter((vendor) => {
     if (selectedType !== "Any" && vendor.type !== selectedType) return false;

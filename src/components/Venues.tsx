@@ -31,33 +31,48 @@ export const Venues = () => {
   const { user } = useAuth();
 
   useEffect(() => {
+    let isMounted = true;
+    
     const fetchVenues = async () => {
       try {
+        setLoading(true);
         const { data, error } = await supabase
           .from("venues")
           .select("*")
           .order("id");
           
-        if (error) throw error;
-        if (data) setVenues(data);
+        if (error) {
+          throw error;
+        }
+        
+        if (isMounted && data) {
+          setVenues(data);
+        }
       } catch (err) {
         console.error("Error fetching venues:", err);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
     
     fetchVenues();
-  }, []);
 
-  useEffect(() => {
     const handler = (e: any) => {
-      const v = venues.find(ven => ven.id === e.detail);
-      if (v) setSelectedVenue(v);
+      setVenues((currentVenues) => {
+        const v = currentVenues.find(ven => ven.id === e.detail);
+        if (v) setSelectedVenue(v);
+        return currentVenues;
+      });
     };
     window.addEventListener('open-venue-modal', handler);
-    return () => window.removeEventListener('open-venue-modal', handler);
-  }, [venues]);
+    
+    return () => {
+      isMounted = false;
+      window.removeEventListener('open-venue-modal', handler);
+    };
+  }, []);
 
   const filteredVenues = venues.filter((venue) => {
     if (selectedType !== "Any" && venue.type !== selectedType) return false;
