@@ -256,77 +256,106 @@ export const VendorModal = ({ vendor, onClose }: VendorModalProps) => {
               <div className="text-sm text-neutral-500">Require an inquiry?</div>
               <div className="font-medium text-brand-burgundy">Response usually within 24 hours</div>
             </div>
-            {!showCalendar ? (
-              <button 
-                onClick={() => setShowCalendar(true)}
-                className="w-full md:w-auto px-8 py-3 bg-brand-burgundy text-brand-cream rounded-sm font-medium hover:bg-brand-burgundy/90 transition-colors shadow-lg flex items-center gap-2 justify-center"
-              >
-                <CalendarIcon className="w-4 h-4" />
-                Check Availability
-              </button>
-            ) : (
-              <button 
-                onClick={() => setShowCalendar(false)}
-                className="w-full md:w-auto px-8 py-3 border border-neutral-300 text-neutral-600 rounded-sm font-medium hover:bg-neutral-50 transition-colors"
-              >
-                Hide Calendar
-              </button>
-            )}
+            <button 
+              onClick={() => setShowCalendar(true)}
+              className="w-full md:w-auto px-8 py-3 bg-brand-burgundy text-brand-cream rounded-sm font-medium hover:bg-brand-burgundy/90 transition-colors shadow-lg flex items-center gap-2 justify-center"
+            >
+              <CalendarIcon className="w-4 h-4" />
+              Check Availability & Book
+            </button>
           </div>
           
-          {/* Calendar View */}
+          {/* Calendar Popup Overlay */}
           <AnimatePresence>
             {showCalendar && (
               <motion.div 
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="bg-neutral-50 border-t border-neutral-200 p-6 flex flex-col md:flex-row gap-8 overflow-hidden rounded-b-xl"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 bg-neutral-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4 md:p-8 rounded-xl"
               >
-                <div className="flex-1 bg-white p-4 rounded-lg shadow-sm border border-neutral-100 flex justify-center">
-                  <style>{`
-                    .rdp {
-                      --rdp-cell-size: 40px;
-                      --rdp-accent-color: #581622;
-                      --rdp-background-color: #fce7f3;
-                    }
-                    .rdp-day_selected:not([disabled]), .rdp-day_selected:focus:not([disabled]), .rdp-day_selected:active:not([disabled]), .rdp-day_selected:hover:not([disabled]) {
-                      background-color: #16a34a; /* Green for selected */
-                      color: white;
-                    }
-                  `}</style>
-                  <DayPicker 
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={setSelectedDate}
-                    modifiers={modifiers}
-                    modifiersStyles={modifiersStyles}
-                    disabled={[{ before: new Date() }, isDateBooked]}
-                  />
-                </div>
-                <div className="flex-[2] flex flex-col justify-center">
-                  <h4 className="text-xl font-serif text-brand-burgundy mb-4">Availability status</h4>
-                  <div className="flex gap-4 mb-6">
-                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-green-600"></div><span className="text-sm text-neutral-600">Free</span></div>
-                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-yellow-400"></div><span className="text-sm text-neutral-600">Pending</span></div>
-                    <div className="flex items-center gap-2"><div className="w-3 h-3 rounded-full bg-red-500"></div><span className="text-sm text-neutral-600">Booked</span></div>
-                  </div>
-                  
-                  {selectedDate ? (
-                    <div className="bg-white p-4 rounded-lg border border-brand-gold/30 shadow-sm animate-in fade-in slide-in-from-bottom-4">
-                      <p className="text-sm text-neutral-500 mb-1">Selected Date:</p>
-                      <p className="font-medium text-brand-burgundy mb-4">{selectedDate.toDateString()}</p>
-                      <button 
-                        onClick={() => setShowPaymentModal(true)}
-                        className="w-full py-3 bg-brand-gold text-neutral-900 font-medium rounded-sm hover:bg-yellow-500 transition-colors shadow-sm"
-                      >
-                        Request Booking & Pay in Escrow (₹{vendor.min_price.toLocaleString()})
-                      </button>
+                <motion.div 
+                  initial={{ scale: 0.95, y: 20 }}
+                  animate={{ scale: 1, y: 0 }}
+                  exit={{ scale: 0.95, y: 20 }}
+                  onClick={(e) => e.stopPropagation()} 
+                  className="bg-white w-full max-w-3xl rounded-xl shadow-2xl overflow-hidden flex flex-col relative"
+                >
+                  <div className="flex items-center justify-between p-6 border-b border-neutral-100 bg-neutral-50/50">
+                    <div>
+                      <h3 className="text-2xl font-serif text-brand-burgundy">Book {vendor.name}</h3>
+                      <p className="text-sm text-neutral-500 mt-1">Select an available date below to proceed with your booking.</p>
                     </div>
-                  ) : (
-                    <p className="text-neutral-500 italic">Select a green date on the calendar to proceed with booking.</p>
-                  )}
-                </div>
+                    <button onClick={() => setShowCalendar(false)} className="p-2 bg-white hover:bg-neutral-100 border border-neutral-200 rounded-full transition-colors shadow-sm">
+                      <X className="w-5 h-5 text-neutral-600" />
+                    </button>
+                  </div>
+
+                  <div className="p-6 flex flex-col md:flex-row gap-8 overflow-y-auto max-h-[60vh]">
+                    <div className="flex-1 bg-neutral-50 p-6 rounded-xl shadow-inner border border-neutral-200 flex justify-center items-start">
+                      <style>{`
+                        .rdp {
+                          --rdp-cell-size: 40px;
+                          --rdp-accent-color: #581622;
+                          --rdp-background-color: #fce7f3;
+                          margin: 0;
+                        }
+                        .rdp-day_selected:not([disabled]), .rdp-day_selected:focus:not([disabled]), .rdp-day_selected:active:not([disabled]), .rdp-day_selected:hover:not([disabled]) {
+                          background-color: #16a34a; /* Green for selected */
+                          color: white;
+                        }
+                      `}</style>
+                      <DayPicker 
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={setSelectedDate}
+                        modifiers={modifiers}
+                        modifiersStyles={modifiersStyles}
+                        disabled={[{ before: new Date() }, isDateBooked]}
+                        className="bg-white p-4 rounded-lg shadow-sm border border-neutral-100"
+                      />
+                    </div>
+                    
+                    <div className="flex-1 flex flex-col justify-start">
+                      <h4 className="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-4">Availability Legend</h4>
+                      <div className="flex flex-col gap-4 mb-8 bg-neutral-50 p-4 rounded-lg border border-neutral-100">
+                        <div className="flex items-center gap-3">
+                          <div className="w-4 h-4 rounded-full bg-green-600 shadow-sm"></div>
+                          <span className="text-sm text-neutral-700 font-medium">Available Date <span className="font-normal italic text-neutral-500">(Click to Select)</span></span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-4 h-4 rounded-full bg-yellow-400 shadow-sm"></div>
+                          <span className="text-sm text-neutral-700 font-medium">Pending Confirmation</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-4 h-4 rounded-full bg-red-500 shadow-sm"></div>
+                          <span className="text-sm text-neutral-700 font-medium">Booked / Unavailable</span>
+                        </div>
+                      </div>
+                      
+                      <div className="mt-auto">
+                        {selectedDate ? (
+                          <div className="bg-brand-burgundy/5 p-5 rounded-xl border border-brand-burgundy/20 animate-in fade-in slide-in-from-bottom-2">
+                            <p className="text-sm text-brand-burgundy font-medium mb-1">Selected Booking Date:</p>
+                            <p className="text-xl font-bold text-brand-burgundy mb-5">{selectedDate.toDateString()}</p>
+                            <button 
+                              onClick={() => setShowPaymentModal(true)}
+                              className="w-full py-3.5 bg-brand-gold text-neutral-900 font-bold rounded-lg hover:bg-yellow-500 transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2 text-lg"
+                            >
+                              Book & Pay ₹{vendor.min_price.toLocaleString()}
+                            </button>
+                            <p className="text-xs text-neutral-500 text-center mt-3">Payment held securely in Escrow</p>
+                          </div>
+                        ) : (
+                          <div className="bg-neutral-50 p-6 rounded-xl border-2 border-neutral-200 border-dashed text-center flex flex-col items-center justify-center h-40">
+                            <CalendarIcon className="w-8 h-8 text-neutral-300 mb-2" />
+                            <p className="text-sm text-neutral-500">Pick an available date to proceed with booking.</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
               </motion.div>
             )}
           </AnimatePresence>
