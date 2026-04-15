@@ -96,9 +96,9 @@ export const BookingPaymentModal = ({ entityId, entityType, date, amount, onClos
       const razorpayForm = new (window as any).Razorpay(options);
       razorpayForm.open();
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Payment flow error:", error);
-      alert("Failed to process payment. Please try again.");
+      alert(`Failed to process payment: ${error?.message || error || "Unknown error"}. Please check the console for more details.`);
       setStep("details");
     } finally {
       setLoading(false);
