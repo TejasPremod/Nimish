@@ -21,6 +21,17 @@ export const BookingPaymentModal = ({ entityId, entityType, date, amount, onClos
     setStep("processing");
 
     try {
+      // 0. Ensure user is logged in before creating the order
+      const { data: userResponse } = await supabase.auth.getUser();
+      const user = userResponse.user;
+      
+      if (!user) {
+        alert("Please login first to book.");
+        onClose();
+        return;
+      }
+
+      // 1. Call your Supabase Edge Function to create an Order
       const { data: orderData, error: orderError } = await supabase.functions.invoke('create-razorpay-order', { 
         body: { amount } 
       });
@@ -40,15 +51,6 @@ export const BookingPaymentModal = ({ entityId, entityType, date, amount, onClos
         order_id: orderData.id,
         handler: async function (response: any) {
           // 3. THIS RUNS AFTER SUCCESSFUL PAYMENT!
-          const { data: userResponse } = await supabase.auth.getUser();
-          const user = userResponse.user;
-          
-          if (!user) {
-            alert("Please login first to book.");
-            onClose();
-            return;
-          }
-          
           // Real booking insertion
           const { data: booking, error: bookingError } = await supabase
             .from('bookings')
