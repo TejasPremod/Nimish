@@ -64,7 +64,7 @@ export default function App() {
       return null;
     }
 
-    if ((hash === "#vendors" || hash === "#venues") && !user) {
+    if (!loading && (hash === "#vendors" || hash === "#venues") && !user) {
       window.location.hash = "#login";
       return null;
     }
