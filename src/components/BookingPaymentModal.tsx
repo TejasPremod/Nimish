@@ -21,12 +21,14 @@ export const BookingPaymentModal = ({ entityId, entityType, date, amount, onClos
     setStep("processing");
 
     try {
-      // 1. Call your Supabase Edge Function to create an Order
       const { data: orderData, error: orderError } = await supabase.functions.invoke('create-razorpay-order', { 
         body: { amount } 
       });
       
-      if (orderError) throw new Error("Failed to create Razorpay Order");
+      if (orderError) {
+        console.error("Supabase edge function error:", orderError);
+        throw new Error(`Edge Function Failed: ${orderError.message || JSON.stringify(orderError)}`);
+      }
 
       // 2. Open the Razorpay Popup
       const options = {
