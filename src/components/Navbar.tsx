@@ -7,13 +7,15 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { cn } from "@/src/lib/utils";
 import { Logo } from "./Logo";
-import { Menu, X, LogOut } from "lucide-react";
+import { Menu, X, LogOut, Heart } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
+import { useLikedItems } from "../lib/LikedItemsContext";
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, profile, signOut } = useAuth();
+  const { likedItems, setSidebarOpen } = useLikedItems();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -62,6 +64,17 @@ export const Navbar = () => {
 
         {/* Desktop Actions */}
         <div className="hidden md:flex items-center gap-4">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="relative p-2 text-neutral-500 hover:text-red-500 transition-colors mr-2"
+          >
+            <Heart className={cn("w-5 h-5", likedItems.length > 0 && "text-red-500 fill-current")} />
+            {likedItems.length > 0 && (
+              <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                {likedItems.length}
+              </span>
+            )}
+          </button>
           {!user ? (
             <a href="#login" className="text-sm font-medium text-brand-burgundy hover:text-brand-gold transition-colors block px-4">
               Sign In
@@ -102,13 +115,27 @@ export const Navbar = () => {
           </motion.a>
         </div>
 
-        {/* Mobile Menu Toggle Button */}
-        <button 
-          className="md:hidden relative z-[60] p-2 text-brand-burgundy focus:outline-none"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-        </button>
+        {/* Mobile Menu Toggle Button & Global Triggers */}
+        <div className="flex md:hidden items-center gap-4 relative z-[60]">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="relative p-2 text-neutral-500 hover:text-red-500 transition-colors"
+          >
+            <Heart className={cn("w-5 h-5", likedItems.length > 0 && "text-red-500 fill-current")} />
+            {likedItems.length > 0 && (
+              <span className="absolute top-0 right-0 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                {likedItems.length}
+              </span>
+            )}
+          </button>
+          
+          <button 
+            className="p-2 text-brand-burgundy focus:outline-none"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          >
+            {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+          </button>
+        </div>
       </motion.nav>
 
       {/* Mobile Menu Overlay */}

@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from "motion/react";
-import { X, MapPin, Star, Heart, CheckCircle2, ChevronRight, ChevronLeft, Calendar as CalendarIcon } from "lucide-react";
+import { X, MapPin, Star, Heart, CheckCircle2, ChevronRight, ChevronLeft, Calendar as CalendarIcon, Users } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
@@ -8,23 +8,22 @@ import { BookingPaymentModal } from "./BookingPaymentModal";
 import { useLikedItems, LikedItem } from "../lib/LikedItemsContext";
 import { cn } from "../lib/utils";
 
-interface Vendor {
+interface Venue {
   id: number;
   name: string;
   type: string;
   location: string;
-  rating: number;
+  capacity: number;
   min_price: number;
   image: string;
-  experience_years?: number;
 }
 
-interface VendorModalProps {
-  vendor: Vendor;
+interface VenueModalProps {
+  venue: Venue;
   onClose: () => void;
 }
 
-export const VendorModal = ({ vendor, onClose }: VendorModalProps) => {
+export const VenueModal = ({ venue, onClose }: VenueModalProps) => {
   const galleryRef = useRef<HTMLDivElement>(null);
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
@@ -32,16 +31,16 @@ export const VendorModal = ({ vendor, onClose }: VendorModalProps) => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const { isLiked, toggleLike } = useLikedItems();
-  const liked = isLiked(vendor.id, 'vendor');
+  const liked = isLiked(venue.id, 'venue');
 
   const handleLike = () => {
     const item: LikedItem = {
-      id: vendor.id,
-      type: 'vendor',
-      name: vendor.name,
-      category: vendor.type,
-      image: vendor.image,
-      min_price: vendor.min_price
+      id: venue.id,
+      type: 'venue',
+      name: venue.name,
+      category: venue.type,
+      image: venue.image,
+      min_price: venue.min_price
     };
     toggleLike(item);
   };
@@ -52,12 +51,12 @@ export const VendorModal = ({ vendor, onClose }: VendorModalProps) => {
         const { data } = await supabase
           .from('bookings')
           .select('*')
-          .eq('vendor_id', vendor.id);
+          .eq('venue_id', venue.id);
         if (data) setBookings(data);
       };
       fetchBookings();
     }
-  }, [showCalendar, vendor.id]);
+  }, [showCalendar, venue.id]);
 
   const bookedDates = bookings.filter(b => b.status === "confirmed").map(b => new Date(b.booking_date));
   const pendingDates = bookings.filter(b => b.status === "pending").map(b => new Date(b.booking_date));
@@ -68,12 +67,11 @@ export const VendorModal = ({ vendor, onClose }: VendorModalProps) => {
   };
   
   const modifiersStyles = {
-    booked: { color: 'white', backgroundColor: '#ef4444' }, // Red
-    pending: { color: 'black', backgroundColor: '#facc15' }, // Yellow
+    booked: { color: 'white', backgroundColor: '#ef4444' },
+    pending: { color: 'black', backgroundColor: '#facc15' },
   };
 
   const isDateBooked = (date: Date) => {
-    // Check if the date corresponds exactly to a booked/pending date ignoring hours
     return bookings.some(b => {
        const bDate = new Date(b.booking_date);
        return bDate.getFullYear() === date.getFullYear() && 
@@ -82,15 +80,7 @@ export const VendorModal = ({ vendor, onClose }: VendorModalProps) => {
     });
   };
 
-  const galleryImages = vendor.name.toUpperCase().includes("NIRMAL")
-    ? [
-        "https://tydiuhvytofiedapxpjh.supabase.co/storage/v1/object/public/images/WhatsApp%20Image%202026-04-14%20at%2016.18.32.jpeg",
-        "https://tydiuhvytofiedapxpjh.supabase.co/storage/v1/object/public/images/WhatsApp%20Image%202026-04-14%20at%2016.18.33.jpeg",
-        "https://tydiuhvytofiedapxpjh.supabase.co/storage/v1/object/public/images/WhatsApp%20Image%202026-04-14%20at%2016.18.37.jpeg",
-        "https://tydiuhvytofiedapxpjh.supabase.co/storage/v1/object/public/images/WhatsApp%20Image%202026-04-14%20at%2016.18.44.jpeg",
-        "https://tydiuhvytofiedapxpjh.supabase.co/storage/v1/object/public/images/WhatsApp%20Image%202026-04-14%20at%2016.18.49.jpeg"
-      ]
-    : Array.from({ length: 4 }).map((_, i) => `https://picsum.photos/seed/vendor-${vendor.id}-${i}/800/1000`);
+  const galleryImages = Array.from({ length: 4 }).map((_, i) => `https://picsum.photos/seed/venue-${venue.id}-${i}/800/1000`);
 
   const scrollGallery = (direction: 'left' | 'right') => {
     if (galleryRef.current) {
@@ -101,7 +91,6 @@ export const VendorModal = ({ vendor, onClose }: VendorModalProps) => {
 
   return (
     <>
-      {/* Backdrop */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -109,7 +98,6 @@ export const VendorModal = ({ vendor, onClose }: VendorModalProps) => {
         onClick={onClose}
         className="fixed inset-0 bg-neutral-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 md:p-8"
       >
-        {/* Modal Container */}
         <motion.div
           initial={{ opacity: 0, y: 50, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -118,11 +106,10 @@ export const VendorModal = ({ vendor, onClose }: VendorModalProps) => {
           onClick={(e) => e.stopPropagation()}
           className="bg-white w-full max-w-4xl max-h-[90vh] rounded-xl overflow-hidden flex flex-col shadow-2xl relative"
         >
-          {/* Header Image & Actions */}
           <div className="relative h-48 md:h-64 flex-shrink-0">
             <img 
-              src={vendor.image} 
-              alt={vendor.name} 
+              src={venue.image} 
+              alt={venue.name} 
               className="w-full h-full object-cover"
               referrerPolicy="no-referrer"
             />
@@ -148,59 +135,50 @@ export const VendorModal = ({ vendor, onClose }: VendorModalProps) => {
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <span className="bg-brand-gold/90 text-neutral-900 text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded shadow-sm">
-                    {vendor.type}
+                    {venue.type}
                   </span>
-                  {vendor.experience_years && (
-                    <span className="bg-white/20 backdrop-blur-md text-white text-[10px] font-bold tracking-wider uppercase px-2 py-0.5 rounded">
-                      {vendor.experience_years} Years Exp.
-                    </span>
-                  )}
                 </div>
-                <h2 className="text-3xl md:text-4xl font-serif text-white">{vendor.name}</h2>
+                <h2 className="text-3xl md:text-4xl font-serif text-white">{venue.name}</h2>
               </div>
               
               <div className="flex flex-col md:items-end">
                 <span className="text-white/80 text-sm">Starting from</span>
-                <span className="text-3xl font-mono font-bold text-white tracking-tight">₹{vendor.min_price.toLocaleString()}</span>
+                <span className="text-3xl font-mono font-bold text-white tracking-tight">₹{venue.min_price.toLocaleString()}</span>
               </div>
             </div>
           </div>
 
-          {/* Scrollable Content */}
           <div className="flex-grow overflow-y-auto overflow-x-hidden">
             <div className="p-6 md:p-8 space-y-12">
               
-              {/* About Section */}
               <section>
                 <div className="flex items-center gap-6 pb-6 border-b border-neutral-100">
                   <div className="flex items-center gap-1.5 text-neutral-600 bg-neutral-100 px-3 py-1.5 rounded-sm text-sm">
                     <MapPin className="w-4 h-4 text-brand-gold" />
-                    <span>{vendor.location}</span>
+                    <span>{venue.location}</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-neutral-600 bg-neutral-100 px-3 py-1.5 rounded-sm text-sm font-medium">
-                    <Star className="w-4 h-4 text-brand-gold fill-current mb-0.5" />
-                    <span>{vendor.rating} Rating</span>
+                    <Users className="w-4 h-4 text-brand-gold" />
+                    <span>Up to {venue.capacity}</span>
                   </div>
                   <div className="flex items-center gap-1.5 text-brand-burgundy bg-brand-burgundy/5 px-3 py-1.5 rounded-sm text-sm font-medium">
                     <CheckCircle2 className="w-4 h-4" />
-                    <span>Verified Partner</span>
+                    <span>Verified Venue</span>
                   </div>
                 </div>
                 
-                <h3 className="text-xl font-serif text-brand-burgundy mt-6 mb-3">About the Vendor</h3>
+                <h3 className="text-xl font-serif text-brand-burgundy mt-6 mb-3">About the Venue</h3>
                 <p className="text-neutral-600 leading-relaxed">
-                  Welcome to {vendor.name}, one of the premier elite partners in the Nimish networking program.
-                  Known for their exquisite attention to detail and outstanding commitment to excellence, they 
-                  have served countless breathtaking events. Whether you are seeking minimalist elegance, or 
-                  grand spectacles, their deep {vendor.experience_years || 'multi-year'} expertise ensures your 
-                  event shines brilliantly.
+                  Welcome to {venue.name}, a magnificent venue perfectly suited for your grand events.
+                  Located in the beautiful surroundings of {venue.location}, it offers unparalleled luxury
+                  and a breathtaking atmosphere. With a capacity of {venue.capacity} guests, it serves as the ultimate
+                  blank canvas for your bespoke architectural event.
                 </p>
               </section>
 
-              {/* Gallery Section */}
               <section>
                 <div className="flex justify-between items-end mb-4">
-                  <h3 className="text-xl font-serif text-brand-burgundy mb-2">Vendor Portfolio</h3>
+                  <h3 className="text-xl font-serif text-brand-burgundy mb-2">Venue Visuals</h3>
                   <div className="flex gap-2">
                     <button onClick={() => scrollGallery('left')} className="p-2 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-600 transition-colors">
                       <ChevronLeft className="w-5 h-5" />
@@ -222,12 +200,11 @@ export const VendorModal = ({ vendor, onClose }: VendorModalProps) => {
                     }
                   `}</style>
                   
-                  {/* Gallery Items */}
                   {galleryImages.map((src, idx) => (
                     <div key={idx} className="flex-shrink-0 w-[260px] md:w-[320px] aspect-[4/5] rounded-sm overflow-hidden snap-center group relative cursor-pointer shadow-sm border border-neutral-100">
                       <img 
                         src={src} 
-                        alt={`${vendor.name} portfolio ${idx + 1}`} 
+                        alt={`${venue.name} venue visual ${idx + 1}`} 
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
                         referrerPolicy="no-referrer"
                       />
@@ -237,41 +214,9 @@ export const VendorModal = ({ vendor, onClose }: VendorModalProps) => {
                 </div>
               </section>
 
-              {/* Reviews Section */}
-              <section>
-                <div className="flex items-center gap-3 mb-6">
-                  <h3 className="text-xl font-serif text-brand-burgundy">Client Reviews</h3>
-                  <div className="bg-brand-gold/20 text-brand-burgundy text-xs font-bold px-2 py-0.5 rounded-full flex items-center">
-                    <Star className="w-3 h-3 fill-current mb-0.5 mr-1" />
-                    {vendor.rating}
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {[1, 2].map((review) => (
-                    <div key={review} className="bg-neutral-50 p-6 rounded-sm border border-neutral-100 text-sm">
-                      <div className="flex items-center gap-1 text-brand-gold mb-3">
-                        {[1,2,3,4,5].map(star => <Star key={star} className="w-3 h-3 fill-current" />)}
-                      </div>
-                      <p className="text-neutral-600 mb-4 leading-relaxed font-serif italic">
-                        "{review === 1 ? 'Absolutely breathtaking experience! The attention to detail and the sheer quality of work delivered by them exceeded all our expectations. They truly brought our vision to reality.' : 'Professional, punctual, and exceptionally talented. Booking this vendor was the best decision we made for our big day. Highly highly recommended!'}"
-                      </p>
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-neutral-200 shrink-0" />
-                        <div>
-                          <div className="font-medium text-neutral-800">{review === 1 ? 'Anjali & Rohan' : 'Sneha & David'}</div>
-                          <div className="text-xs text-neutral-400">Verified Client</div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
-
             </div>
           </div>
           
-          {/* Footer Sticky Action */}
           <div className="border-t border-neutral-100 p-4 md:p-6 bg-white shrink-0 flex items-center justify-between">
             <div className="hidden md:block">
               <div className="text-sm text-neutral-500">Require an inquiry?</div>
@@ -286,7 +231,6 @@ export const VendorModal = ({ vendor, onClose }: VendorModalProps) => {
             </button>
           </div>
           
-          {/* Calendar Popup Overlay */}
           <AnimatePresence>
             {showCalendar && (
               <motion.div 
@@ -304,7 +248,7 @@ export const VendorModal = ({ vendor, onClose }: VendorModalProps) => {
                 >
                   <div className="flex items-center justify-between p-6 border-b border-neutral-100 bg-neutral-50/50">
                     <div>
-                      <h3 className="text-2xl font-serif text-brand-burgundy">Book {vendor.name}</h3>
+                      <h3 className="text-2xl font-serif text-brand-burgundy">Book {venue.name}</h3>
                       <p className="text-sm text-neutral-500 mt-1">Select an available date below to proceed with your booking.</p>
                     </div>
                     <button onClick={() => setShowCalendar(false)} className="p-2 bg-white hover:bg-neutral-100 border border-neutral-200 rounded-full transition-colors shadow-sm">
@@ -322,7 +266,7 @@ export const VendorModal = ({ vendor, onClose }: VendorModalProps) => {
                           margin: 0;
                         }
                         .rdp-day_selected:not([disabled]), .rdp-day_selected:focus:not([disabled]), .rdp-day_selected:active:not([disabled]), .rdp-day_selected:hover:not([disabled]) {
-                          background-color: #16a34a; /* Green for selected */
+                          background-color: #16a34a; 
                           color: white;
                         }
                       `}</style>
@@ -363,7 +307,7 @@ export const VendorModal = ({ vendor, onClose }: VendorModalProps) => {
                               onClick={() => setShowPaymentModal(true)}
                               className="w-full py-3.5 bg-brand-gold text-neutral-900 font-bold rounded-lg hover:bg-yellow-500 transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2 text-lg"
                             >
-                              Book & Pay ₹{vendor.min_price.toLocaleString()}
+                              Book & Pay ₹{venue.min_price.toLocaleString()}
                             </button>
                             <p className="text-xs text-neutral-500 text-center mt-3">Payment held securely in Escrow</p>
                           </div>
@@ -385,10 +329,10 @@ export const VendorModal = ({ vendor, onClose }: VendorModalProps) => {
 
       {showPaymentModal && selectedDate && (
         <BookingPaymentModal 
-          entityId={vendor.id}
-          entityType={"vendor"}
+          entityId={venue.id}
+          entityType={"venue"}
           date={selectedDate}
-          amount={vendor.min_price}
+          amount={venue.min_price}
           onClose={() => setShowPaymentModal(false)}
           onSuccess={() => {
             setShowPaymentModal(false);

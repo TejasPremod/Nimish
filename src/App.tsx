@@ -19,6 +19,8 @@ import { Venues } from "./components/Venues";
 import { Auth } from "./components/Auth";
 import { Profile } from "./components/Profile";
 import { useAuth } from "./contexts/AuthContext";
+import { LikedItemsProvider } from "./lib/LikedItemsContext";
+import { LikedItemsSidebar } from "./components/LikedItemsSidebar";
 
 const Footer = () => (
   <footer className="py-12 px-8 border-t border-brand-gold/10 bg-brand-cream">
@@ -102,21 +104,25 @@ export default function App() {
   }, [hash]);
 
   return (
-    <div className="relative min-h-screen font-sans selection:bg-brand-gold selection:text-brand-burgundy flex flex-col">
-      {/* Progress Bar */}
-      <motion.div
-        className="fixed top-0 left-0 right-0 h-1 bg-brand-gold z-[60] origin-left"
-        style={{ scaleX }}
-      />
+    <LikedItemsProvider>
+      <div className="relative min-h-screen font-sans selection:bg-brand-gold selection:text-brand-burgundy flex flex-col">
+        {/* Progress Bar */}
+        <motion.div
+          className="fixed top-0 left-0 right-0 h-1 bg-brand-gold z-[60] origin-left"
+          style={{ scaleX }}
+        />
 
-      <Background />
-      <Navbar />
+        <Background />
+        <Navbar />
+        <LikedItemsSidebar />
+        
       
       <main className="flex-grow">
         {renderPage()}
       </main>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </LikedItemsProvider>
   );
 }

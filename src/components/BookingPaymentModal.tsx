@@ -4,14 +4,15 @@ import { X, ShieldCheck, CreditCard, CheckCircle2, Lock } from "lucide-react";
 import { supabase } from "../lib/supabase";
 
 interface BookingPaymentModalProps {
-  vendorId: number;
+  entityId: number;
+  entityType: 'vendor' | 'venue';
   date: Date;
   amount: number;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-export const BookingPaymentModal = ({ vendorId, date, amount, onClose, onSuccess }: BookingPaymentModalProps) => {
+export const BookingPaymentModal = ({ entityId, entityType, date, amount, onClose, onSuccess }: BookingPaymentModalProps) => {
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<"details" | "processing" | "success">("details");
 
@@ -41,7 +42,8 @@ export const BookingPaymentModal = ({ vendorId, date, amount, onClose, onSuccess
         .from('bookings')
         .insert({
           user_id: user.id,
-          vendor_id: vendorId,
+          vendor_id: entityType === 'vendor' ? entityId : null,
+          venue_id: entityType === 'venue' ? entityId : null,
           booking_date: date.toISOString().split('T')[0],
           total_amount: amount,
           status: 'pending' // Yellow state (Escrow held)

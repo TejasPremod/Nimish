@@ -4,6 +4,8 @@ import { MapPin, Users, Heart } from "lucide-react";
 import { DirectoryLayout } from "./DirectoryLayout";
 import { cn } from "../lib/utils";
 import { supabase } from "../lib/supabase";
+import { VenueModal } from "./VenueModal";
+import { useLikedItems } from "../lib/LikedItemsContext";
 
 interface Venue {
   id: number;
@@ -22,6 +24,9 @@ export const Venues = () => {
   const [loading, setLoading] = useState(true);
   const [selectedType, setSelectedType] = useState("Any");
   const [capacity, setCapacity] = useState(100);
+  const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
+
+  const { isLiked, toggleLike } = useLikedItems();
 
   useEffect(() => {
     const fetchVenues = async () => {
@@ -136,8 +141,24 @@ export const Venues = () => {
               <div className="p-5 flex flex-col flex-grow">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="text-2xl font-serif text-brand-burgundy group-hover:text-brand-gold transition-colors">{venue.name}</h3>
-                  <button className="text-neutral-300 hover:text-red-500 transition-colors">
-                    <Heart className="w-5 h-5" />
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleLike({
+                        id: venue.id,
+                        type: 'venue',
+                        name: venue.name,
+                        category: venue.type,
+                        image: venue.image,
+                        min_price: venue.min_price
+                      });
+                    }}
+                    className={cn(
+                      "transition-colors",
+                      isLiked(venue.id, 'venue') ? "text-red-500" : "text-neutral-300 hover:text-red-500"
+                    )}
+                  >
+                    <Heart className={cn("w-5 h-5", isLiked(venue.id, 'venue') && "fill-current")} />
                   </button>
                 </div>
 
@@ -159,7 +180,10 @@ export const Venues = () => {
                     <span className="text-xs text-neutral-400 block">Starting from</span>
                     <span className="text-lg font-mono font-bold text-neutral-800">₹{venue.min_price.toLocaleString()}</span>
                   </div>
-                  <button className="px-5 py-2 border border-brand-burgundy text-brand-burgundy hover:bg-brand-burgundy hover:text-white transition-colors text-sm font-medium rounded-sm">
+                  <button 
+                    onClick={() => setSelectedVenue(venue)}
+                    className="px-5 py-2 border border-brand-burgundy text-brand-burgundy hover:bg-brand-burgundy hover:text-white transition-colors text-sm font-medium rounded-sm"
+                  >
                     View Details
                   </button>
                 </div>
@@ -174,6 +198,15 @@ export const Venues = () => {
           No venues found matching your capacity requirements.
         </div>
       )}
+
+      <AnimatePresence>
+        {selectedVenue && (
+          <VenueModal 
+            venue={selectedVenue} 
+            onClose={() => setSelectedVenue(null)} 
+          />
+        )}
+      </AnimatePresence>
     </DirectoryLayout>
   );
 };

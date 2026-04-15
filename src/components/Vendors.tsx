@@ -5,6 +5,7 @@ import { DirectoryLayout } from "./DirectoryLayout";
 import { cn } from "../lib/utils";
 import { supabase } from "../lib/supabase";
 import { VendorModal } from "./VendorModal";
+import { useLikedItems } from "../lib/LikedItemsContext";
 
 interface Vendor {
   id: number;
@@ -25,6 +26,8 @@ export const Vendors = () => {
   const [selectedType, setSelectedType] = useState("Any");
   const [priceRange, setPriceRange] = useState(20000);
   const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
+
+  const { isLiked, toggleLike } = useLikedItems();
 
   useEffect(() => {
     const fetchVendors = async () => {
@@ -139,8 +142,24 @@ export const Vendors = () => {
               <div className="p-5 flex flex-col flex-grow">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="text-2xl font-serif text-brand-burgundy group-hover:text-brand-gold transition-colors">{vendor.name}</h3>
-                  <button className="text-neutral-300 hover:text-red-500 transition-colors">
-                    <Heart className="w-5 h-5" />
+                  <button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleLike({
+                        id: vendor.id,
+                        type: 'vendor',
+                        name: vendor.name,
+                        category: vendor.type,
+                        image: vendor.image,
+                        min_price: vendor.min_price
+                      });
+                    }}
+                    className={cn(
+                      "transition-colors",
+                      isLiked(vendor.id, 'vendor') ? "text-red-500" : "text-neutral-300 hover:text-red-500"
+                    )}
+                  >
+                    <Heart className={cn("w-5 h-5", isLiked(vendor.id, 'vendor') && "fill-current")} />
                   </button>
                 </div>
 
