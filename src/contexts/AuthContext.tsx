@@ -120,7 +120,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     try {
-      await supabase.auth.signOut();
+      // Pass scope: 'local' if you want to avoid server errors on stale sessions, 
+      // but a standard signOut removes it from the server if possible.
+      // We wrap it in a timeout just in case it hangs forever.
+      await Promise.race([
+        supabase.auth.signOut(),
+        new Promise(resolve => setTimeout(resolve, 2000)) // 2 second timeout
+      ]);
     } catch (error: any) {
       console.error("Error signing out:", error.message);
     }
@@ -130,15 +136,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setSession(null);
     setProfile(null);
     
-    // Clear localStorage to ensure Supabase session strings are wiped immediately 
-    // even if the async signOut failed under poor network conditions
+    // Clear any Supabase related storage
     Object.keys(localStorage).forEach(key => {
-      if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
+      if (key.startsWith('sb-') || key.startsWith('supabase')) {
         localStorage.removeItem(key);
       }
     });
     
-    window.location.hash = "";
+    sessionStorage.clear();
+    
+    // Force application reload to root path to completely wipe any in-memory state
+    window.location.href = window.location.pathname;
   };
 
   return (
