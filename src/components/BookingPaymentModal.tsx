@@ -38,7 +38,23 @@ export const BookingPaymentModal = ({ entityId, entityType, date, amount, onClos
       
       if (orderError) {
         console.error("Supabase edge function error:", orderError);
-        throw new Error(`Edge Function Failed: ${orderError.message || JSON.stringify(orderError)}`);
+        let errorDetails = orderError.message || JSON.stringify(orderError);
+        
+        // Extract the raw JSON error string sent by our Deno edge function!
+        if (orderError.context && typeof orderError.context.json === 'function') {
+          try {
+            const body = await orderError.context.clone().json();
+            if (body && body.error) {
+              errorDetails = body.error;
+            } else {
+              errorDetails = JSON.stringify(body);
+            }
+          } catch (e) {
+            console.error("Failed to parse error context", e);
+          }
+        }
+        
+        throw new Error(`Edge Function Failed: ${errorDetails}`);
       }
 
       // 2. Open the Razorpay Popup
