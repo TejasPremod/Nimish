@@ -1,9 +1,40 @@
+import { useState } from "react";
 import { motion } from "motion/react";
 import { useAuth } from "../contexts/AuthContext";
-import { LogIn } from "lucide-react";
+import { LogIn, Loader2 } from "lucide-react";
 
 export const Auth = () => {
-  const { signInWithGoogle } = useAuth();
+  const { signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuth();
+  const [isSignIn, setIsSignIn] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ type: "", text: "" });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) return;
+    
+    setLoading(true);
+    setMessage({ type: "", text: "" });
+    
+    if (isSignIn) {
+      const { error } = await signInWithEmail(email, password);
+      if (error) {
+        setMessage({ type: "error", text: error.message });
+      }
+    } else {
+      const { error } = await signUpWithEmail(email, password);
+      if (error) {
+        setMessage({ type: "error", text: error.message });
+      } else {
+        setMessage({ type: "success", text: "Account created! If you are not auto-redirected, please sign in." });
+        // Optionally switch to sign in
+        setTimeout(() => setIsSignIn(true), 2000);
+      }
+    }
+    setLoading(false);
+  };
 
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center px-8 bg-brand-cream overflow-hidden">
@@ -14,22 +45,75 @@ export const Auth = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md bg-white rounded-xl shadow-2xl p-8 md:p-12 border border-brand-gold/20 relative z-10 flex flex-col items-center text-center"
+        className="w-full max-w-md bg-white rounded-xl shadow-2xl p-8 md:p-10 border border-brand-gold/20 relative z-10 flex flex-col items-center"
       >
         <div className="w-16 h-16 bg-brand-cream rounded-full flex items-center justify-center mb-6 shadow-inner">
           <LogIn className="w-8 h-8 text-brand-burgundy" />
         </div>
         
-        <h2 className="text-3xl font-serif text-brand-burgundy mb-2">Welcome Back</h2>
-        <p className="text-neutral-500 mb-8 text-sm">
-          Sign in to access exclusive vendors and venues for your events.
+        <h2 className="text-3xl font-serif text-brand-burgundy mb-2 text-center">
+          {isSignIn ? "Welcome Back" : "Create Account"}
+        </h2>
+        <p className="text-neutral-500 mb-6 text-sm text-center">
+          {isSignIn 
+            ? "Sign in to access exclusive vendors and venues for your events."
+            : "Sign up to start planning your perfect event today."}
         </p>
 
+        {message.text && (
+          <div className={`w-full p-3 rounded-md mb-6 text-sm text-center ${
+            message.type === 'error' ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-green-50 text-green-700 border border-green-200'
+          }`}>
+            {message.text}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="w-full space-y-4 mb-6">
+          <div>
+            <label className="block text-sm font-medium text-neutral-700 mb-1">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-md focus:ring-2 focus:ring-brand-gold focus:border-brand-gold outline-none transition-all"
+              placeholder="you@example.com"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-neutral-700 mb-1">Password</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              className="w-full px-4 py-3 bg-neutral-50 border border-neutral-200 rounded-md focus:ring-2 focus:ring-brand-gold focus:border-brand-gold outline-none transition-all"
+              placeholder="••••••••"
+            />
+          </div>
+          
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full mt-2 px-6 py-4 bg-brand-burgundy text-brand-cream rounded-md font-medium shadow-lg hover:bg-brand-burgundy/90 transition-colors disabled:opacity-70 flex items-center justify-center gap-2"
+          >
+            {loading ? <><Loader2 size={18} className="animate-spin" /> Please wait...</> : (isSignIn ? "Sign In" : "Sign Up")}
+          </button>
+        </form>
+
+        <div className="w-full flex items-center justify-between mb-6">
+          <div className="w-full h-px bg-neutral-200"></div>
+          <span className="px-4 text-xs text-neutral-400 uppercase tracking-wider font-medium">Or</span>
+          <div className="w-full h-px bg-neutral-200"></div>
+        </div>
+
         <button
+          type="button"
           onClick={signInWithGoogle}
-          className="w-full relative group px-6 py-4 bg-brand-burgundy text-brand-cream rounded-md overflow-hidden shadow-lg transition-transform hover:-translate-y-0.5 active:translate-y-0"
+          className="w-full relative group px-6 py-3 bg-white border border-neutral-200 text-neutral-700 rounded-md overflow-hidden hover:bg-neutral-50 transition-colors shadow-sm"
         >
-          <span className="relative z-10 font-medium flex items-center justify-center gap-3">
+          <span className="relative z-10 font-medium flex items-center justify-center gap-3 text-sm">
             <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current" xmlns="http://www.w3.org/2000/svg">
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -38,8 +122,22 @@ export const Auth = () => {
             </svg>
             Continue with Google
           </span>
-          <div className="absolute inset-0 bg-brand-gold/10 opacity-0 group-hover:opacity-100 transition-opacity" />
         </button>
+
+        <p className="mt-8 text-sm text-neutral-500">
+          {isSignIn ? "Don't have an account?" : "Already have an account?"}{" "}
+          <button 
+            type="button" 
+            onClick={() => {
+              setIsSignIn(!isSignIn);
+              setMessage({ type: "", text: "" });
+            }} 
+            className="text-brand-burgundy font-medium hover:underline focus:outline-none"
+          >
+            {isSignIn ? "Sign Up" : "Sign In"}
+          </button>
+        </p>
+
       </motion.div>
     </section>
   );

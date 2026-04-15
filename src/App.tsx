@@ -17,6 +17,7 @@ import { Portfolio } from "./components/Portfolio";
 import { About } from "./components/About";
 import { Venues } from "./components/Venues";
 import { Auth } from "./components/Auth";
+import { Profile } from "./components/Profile";
 import { useAuth } from "./contexts/AuthContext";
 
 const Footer = () => (
@@ -46,7 +47,7 @@ const Footer = () => (
 
 export default function App() {
   const [hash, setHash] = useState(window.location.hash);
-  const { user } = useAuth();
+  const { user, profile, loading } = useAuth();
 
   useEffect(() => {
     const onHashChange = () => setHash(window.location.hash);
@@ -55,6 +56,12 @@ export default function App() {
   }, []);
 
   const renderPage = () => {
+    // Force profile completion if user is logged in but hasn't completed their profile yet
+    if (!loading && user && !profile && hash !== "#profile") {
+      window.location.hash = "#profile";
+      return null;
+    }
+
     if ((hash === "#vendors" || hash === "#venues") && !user) {
       window.location.hash = "#login";
       return null;
@@ -63,6 +70,8 @@ export default function App() {
     switch (hash) {
       case "#login":
         return user ? <Home /> : <Auth />;
+      case "#profile":
+        return user ? <Profile /> : <Auth />;
       case "#vendors":
         return <Vendors />;
       case "#venues":

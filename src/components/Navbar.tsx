@@ -13,7 +13,7 @@ import { useAuth } from "../contexts/AuthContext";
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { user, signOut } = useAuth();
+  const { user, profile, signOut } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -67,9 +67,25 @@ export const Navbar = () => {
               Sign In
             </a>
           ) : (
-            <button onClick={signOut} className="text-sm font-medium text-brand-burgundy hover:text-red-600 transition-colors flex items-center gap-2 px-4 focus:outline-none">
-              <LogOut size={16} /> Sign Out
-            </button>
+            <div className="flex items-center gap-4">
+              <a href="#profile" className="flex items-center gap-2 group">
+                <div className="w-8 h-8 rounded-full overflow-hidden bg-brand-cream border border-brand-gold/30">
+                  {profile?.avatar_url ? (
+                    <img src={profile.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-brand-burgundy font-medium text-sm">
+                      {profile?.first_name?.[0] || user.user_metadata?.full_name?.[0] || "U"}
+                    </div>
+                  )}
+                </div>
+                <span className="text-sm font-medium text-brand-burgundy group-hover:text-brand-gold transition-colors">
+                  {profile?.first_name || user.user_metadata?.full_name?.split(" ")[0] || "Profile"}
+                </span>
+              </a>
+              <button onClick={signOut} className="text-sm font-medium text-neutral-400 hover:text-red-600 transition-colors flex items-center gap-1 focus:outline-none" title="Sign Out">
+                <LogOut size={16} />
+              </button>
+            </div>
           )}
           <motion.a
             href="tel:+919995488911"
@@ -125,15 +141,24 @@ export const Navbar = () => {
                   Sign In
                 </a>
               ) : (
-                <button 
-                  onClick={() => {
-                    signOut();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="text-3xl font-serif text-red-600 hover:text-red-700 transition-colors mt-4 flex items-center gap-3"
-                >
-                  <LogOut size={28} /> Sign Out
-                </button>
+                <>
+                  <a 
+                    href="#profile" 
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-3xl font-serif text-brand-gold hover:text-brand-burgundy transition-colors mt-4 flex items-center gap-3"
+                  >
+                    Profile
+                  </a>
+                  <button 
+                    onClick={() => {
+                      signOut();
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className="text-2xl font-serif text-red-600 hover:text-red-700 transition-colors mt-2 flex items-center gap-3"
+                  >
+                    <LogOut size={24} /> Sign Out
+                  </button>
+                </>
               )}
 
               <div className="w-full h-px bg-brand-gold/20 my-4" />
