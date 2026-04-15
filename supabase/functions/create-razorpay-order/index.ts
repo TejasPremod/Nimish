@@ -3,6 +3,9 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 // @ts-ignore: Deno import not recognized by Node.js TypeScript
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.7.1"
 
+// Declare Deno globally so Node.js TypeScript stops complaining
+declare const Deno: any;
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
