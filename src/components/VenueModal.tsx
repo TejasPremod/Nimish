@@ -7,6 +7,7 @@ import { supabase } from "../lib/supabase";
 import { BookingPaymentModal } from "./BookingPaymentModal";
 import { useLikedItems, LikedItem } from "../lib/LikedItemsContext";
 import { cn } from "../lib/utils";
+import { useAuth } from "../contexts/AuthContext";
 
 interface Venue {
   id: number;
@@ -32,6 +33,7 @@ export const VenueModal = ({ venue, onClose }: VenueModalProps) => {
 
   const { isLiked, toggleLike } = useLikedItems();
   const liked = isLiked(venue.id, 'venue');
+  const { user } = useAuth();
 
   const handleLike = () => {
     const item: LikedItem = {
@@ -121,15 +123,17 @@ export const VenueModal = ({ venue, onClose }: VenueModalProps) => {
             >
               <X className="w-5 h-5" />
             </button>
-            <button 
-              onClick={handleLike}
-              className={cn(
-                "absolute top-4 right-14 bg-white/20 hover:bg-white/40 backdrop-blur-md py-2 px-3 text-sm text-white rounded-full flex items-center gap-1 transition-colors",
-                liked && "text-red-500"
-              )}
-            >
-              <Heart className={cn("w-4 h-4", liked && "fill-current")} /> {liked ? 'Saved' : 'Save'}
-            </button>
+            {user && (
+              <button 
+                onClick={handleLike}
+                className={cn(
+                  "absolute top-4 right-14 bg-white/20 hover:bg-white/40 backdrop-blur-md py-2 px-3 text-sm text-white rounded-full flex items-center gap-1 transition-colors",
+                  liked && "text-red-500"
+                )}
+              >
+                <Heart className={cn("w-4 h-4", liked && "fill-current")} /> {liked ? 'Saved' : 'Save'}
+              </button>
+            )}
 
             <div className="absolute bottom-6 left-6 right-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div>
@@ -209,6 +213,37 @@ export const VenueModal = ({ venue, onClose }: VenueModalProps) => {
                         referrerPolicy="no-referrer"
                       />
                       <div className="absolute inset-0 bg-black/opacity-0 group-hover:bg-black/10 transition-colors duration-300 pointer-events-none" />
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* Reviews Section */}
+              <section>
+                <div className="flex items-center gap-3 mb-6">
+                  <h3 className="text-xl font-serif text-brand-burgundy">Client Reviews</h3>
+                  <div className="bg-brand-gold/20 text-brand-burgundy text-xs font-bold px-2 py-0.5 rounded-full flex items-center">
+                    <Star className="w-3 h-3 fill-current mb-0.5 mr-1" />
+                    4.9
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[1, 2].map((review) => (
+                    <div key={review} className="bg-neutral-50 p-6 rounded-sm border border-neutral-100 text-sm">
+                      <div className="flex items-center gap-1 text-brand-gold mb-3">
+                        {[1,2,3,4,5].map(star => <Star key={star} className="w-3 h-3 fill-current" />)}
+                      </div>
+                      <p className="text-neutral-600 mb-4 leading-relaxed font-serif italic">
+                        "{review === 1 ? 'Absolutely breathtaking experience! The attention to detail and the sheer quality of work delivered by them exceeded all our expectations. They truly brought our vision to reality.' : 'Professional, punctual, and exceptionally talented. Booking this venue was the best decision we made for our big day. Highly highly recommended!'}"
+                      </p>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full bg-neutral-200 shrink-0" />
+                        <div>
+                          <div className="font-medium text-neutral-800">{review === 1 ? 'Anjali & Rohan' : 'Sneha & David'}</div>
+                          <div className="text-xs text-neutral-400">Verified Client</div>
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>

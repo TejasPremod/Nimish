@@ -79,7 +79,14 @@ export const LikedItemsSidebar = () => {
                       </button>
                       <button 
                         onClick={() => {
-                          window.location.href = item.type === 'vendor' ? '/vendors' : '/venues';
+                          if (item.type === 'vendor') {
+                            window.location.hash = '#vendors';
+                            setTimeout(() => window.dispatchEvent(new CustomEvent('open-vendor-modal', { detail: item.id })), 100);
+                          } else {
+                            window.location.hash = '#venues';
+                            setTimeout(() => window.dispatchEvent(new CustomEvent('open-venue-modal', { detail: item.id })), 100);
+                          }
+                          setSidebarOpen(false);
                         }}
                         className="p-2 text-brand-burgundy hover:bg-brand-burgundy/10 rounded-full transition-colors"
                         title="View Directory"

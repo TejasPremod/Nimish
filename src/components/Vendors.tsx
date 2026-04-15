@@ -6,6 +6,7 @@ import { cn } from "../lib/utils";
 import { supabase } from "../lib/supabase";
 import { VendorModal } from "./VendorModal";
 import { useLikedItems } from "../lib/LikedItemsContext";
+import { useAuth } from "../contexts/AuthContext";
 
 interface Vendor {
   id: number;
@@ -28,6 +29,7 @@ export const Vendors = () => {
   const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
 
   const { isLiked, toggleLike } = useLikedItems();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchVendors = async () => {
@@ -48,6 +50,15 @@ export const Vendors = () => {
     
     fetchVendors();
   }, []);
+
+  useEffect(() => {
+    const handler = (e: any) => {
+      const v = vendors.find(ven => ven.id === e.detail);
+      if (v) setSelectedVendor(v);
+    };
+    window.addEventListener('open-vendor-modal', handler);
+    return () => window.removeEventListener('open-vendor-modal', handler);
+  }, [vendors]);
 
   const filteredVendors = vendors.filter((vendor) => {
     if (selectedType !== "Any" && vendor.type !== selectedType) return false;
@@ -142,25 +153,27 @@ export const Vendors = () => {
               <div className="p-5 flex flex-col flex-grow">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="text-2xl font-serif text-brand-burgundy group-hover:text-brand-gold transition-colors">{vendor.name}</h3>
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleLike({
-                        id: vendor.id,
-                        type: 'vendor',
-                        name: vendor.name,
-                        category: vendor.type,
-                        image: vendor.image,
-                        min_price: vendor.min_price
-                      });
-                    }}
-                    className={cn(
-                      "transition-colors",
-                      isLiked(vendor.id, 'vendor') ? "text-red-500" : "text-neutral-300 hover:text-red-500"
-                    )}
-                  >
-                    <Heart className={cn("w-5 h-5", isLiked(vendor.id, 'vendor') && "fill-current")} />
-                  </button>
+                  {user && (
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleLike({
+                          id: vendor.id,
+                          type: 'vendor',
+                          name: vendor.name,
+                          category: vendor.type,
+                          image: vendor.image,
+                          min_price: vendor.min_price
+                        });
+                      }}
+                      className={cn(
+                        "transition-colors",
+                        isLiked(vendor.id, 'vendor') ? "text-red-500" : "text-neutral-300 hover:text-red-500"
+                      )}
+                    >
+                      <Heart className={cn("w-5 h-5", isLiked(vendor.id, 'vendor') && "fill-current")} />
+                    </button>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-4 text-sm text-neutral-500 mb-4">

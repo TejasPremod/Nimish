@@ -6,6 +6,7 @@ import { cn } from "../lib/utils";
 import { supabase } from "../lib/supabase";
 import { VenueModal } from "./VenueModal";
 import { useLikedItems } from "../lib/LikedItemsContext";
+import { useAuth } from "../contexts/AuthContext";
 
 interface Venue {
   id: number;
@@ -27,6 +28,7 @@ export const Venues = () => {
   const [selectedVenue, setSelectedVenue] = useState<Venue | null>(null);
 
   const { isLiked, toggleLike } = useLikedItems();
+  const { user } = useAuth();
 
   useEffect(() => {
     const fetchVenues = async () => {
@@ -47,6 +49,15 @@ export const Venues = () => {
     
     fetchVenues();
   }, []);
+
+  useEffect(() => {
+    const handler = (e: any) => {
+      const v = venues.find(ven => ven.id === e.detail);
+      if (v) setSelectedVenue(v);
+    };
+    window.addEventListener('open-venue-modal', handler);
+    return () => window.removeEventListener('open-venue-modal', handler);
+  }, [venues]);
 
   const filteredVenues = venues.filter((venue) => {
     if (selectedType !== "Any" && venue.type !== selectedType) return false;
@@ -141,25 +152,27 @@ export const Venues = () => {
               <div className="p-5 flex flex-col flex-grow">
                 <div className="flex justify-between items-start mb-2">
                   <h3 className="text-2xl font-serif text-brand-burgundy group-hover:text-brand-gold transition-colors">{venue.name}</h3>
-                  <button 
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleLike({
-                        id: venue.id,
-                        type: 'venue',
-                        name: venue.name,
-                        category: venue.type,
-                        image: venue.image,
-                        min_price: venue.min_price
-                      });
-                    }}
-                    className={cn(
-                      "transition-colors",
-                      isLiked(venue.id, 'venue') ? "text-red-500" : "text-neutral-300 hover:text-red-500"
-                    )}
-                  >
-                    <Heart className={cn("w-5 h-5", isLiked(venue.id, 'venue') && "fill-current")} />
-                  </button>
+                  {user && (
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleLike({
+                          id: venue.id,
+                          type: 'venue',
+                          name: venue.name,
+                          category: venue.type,
+                          image: venue.image,
+                          min_price: venue.min_price
+                        });
+                      }}
+                      className={cn(
+                        "transition-colors",
+                        isLiked(venue.id, 'venue') ? "text-red-500" : "text-neutral-300 hover:text-red-500"
+                      )}
+                    >
+                      <Heart className={cn("w-5 h-5", isLiked(venue.id, 'venue') && "fill-current")} />
+                    </button>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-4 text-sm text-neutral-500 mb-4">

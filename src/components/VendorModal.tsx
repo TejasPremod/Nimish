@@ -7,6 +7,7 @@ import { supabase } from "../lib/supabase";
 import { BookingPaymentModal } from "./BookingPaymentModal";
 import { useLikedItems, LikedItem } from "../lib/LikedItemsContext";
 import { cn } from "../lib/utils";
+import { useAuth } from "../contexts/AuthContext";
 
 interface Vendor {
   id: number;
@@ -33,6 +34,7 @@ export const VendorModal = ({ vendor, onClose }: VendorModalProps) => {
 
   const { isLiked, toggleLike } = useLikedItems();
   const liked = isLiked(vendor.id, 'vendor');
+  const { user } = useAuth();
 
   const handleLike = () => {
     const item: LikedItem = {
@@ -134,15 +136,17 @@ export const VendorModal = ({ vendor, onClose }: VendorModalProps) => {
             >
               <X className="w-5 h-5" />
             </button>
-            <button 
-              onClick={handleLike}
-              className={cn(
-                "absolute top-4 right-14 bg-white/20 hover:bg-white/40 backdrop-blur-md py-2 px-3 text-sm text-white rounded-full flex items-center gap-1 transition-colors",
-                liked && "text-red-500"
-              )}
-            >
-              <Heart className={cn("w-4 h-4", liked && "fill-current")} /> {liked ? 'Saved' : 'Save'}
-            </button>
+            {user && (
+              <button 
+                onClick={handleLike}
+                className={cn(
+                  "absolute top-4 right-14 bg-white/20 hover:bg-white/40 backdrop-blur-md py-2 px-3 text-sm text-white rounded-full flex items-center gap-1 transition-colors",
+                  liked && "text-red-500"
+                )}
+              >
+                <Heart className={cn("w-4 h-4", liked && "fill-current")} /> {liked ? 'Saved' : 'Save'}
+              </button>
+            )}
 
             <div className="absolute bottom-6 left-6 right-6 flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div>
