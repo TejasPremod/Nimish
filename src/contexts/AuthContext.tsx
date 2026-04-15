@@ -130,9 +130,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setSession(null);
     setProfile(null);
     
-    // Clear URL hash to ensure clean state and reload to completely flush memory/storage state
+    // Clear localStorage to ensure Supabase session strings are wiped immediately 
+    // even if the async signOut failed under poor network conditions
+    Object.keys(localStorage).forEach(key => {
+      if (key.startsWith('sb-') && key.endsWith('-auth-token')) {
+        localStorage.removeItem(key);
+      }
+    });
+    
     window.location.hash = "";
-    window.location.reload();
   };
 
   return (

@@ -153,14 +153,6 @@ export const Profile = () => {
             </p>
           </div>
 
-          {message.text && (
-            <div className={`p-4 rounded-md mb-6 text-sm ${
-              message.type === 'error' ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-green-50 text-green-700 border border-green-200'
-            }`}>
-              {message.text}
-            </div>
-          )}
-
           <div className="flex flex-col items-center mb-10">
             <div className="relative group">
               <div className="w-32 h-32 rounded-full overflow-hidden bg-brand-cream border-2 border-brand-gold/30 shadow-inner flex items-center justify-center relative">
@@ -251,10 +243,18 @@ export const Profile = () => {
               </div>
             </div>
 
+            {message.text && (
+              <div className={`p-4 rounded-md text-sm ${
+                message.type === 'error' ? 'bg-red-50 text-red-600 border border-red-200' : 'bg-green-50 text-green-700 border border-green-200'
+              }`}>
+                {message.text}
+              </div>
+            )}
+
             <button
               type="submit"
               disabled={loading}
-              className="w-full mt-8 px-6 py-4 bg-brand-burgundy text-brand-cream rounded-md font-medium shadow-lg hover:bg-brand-burgundy/90 transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full mt-2 px-6 py-4 bg-brand-burgundy text-brand-cream rounded-md font-medium shadow-lg hover:bg-brand-burgundy/90 transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? (
                 <><Loader2 size={18} className="animate-spin" /> Saving Changes...</>
