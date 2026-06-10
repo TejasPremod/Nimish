@@ -13,7 +13,7 @@ serve(async (req) => {
 
   try {
     const payload = await req.json()
-    
+
     // In a real application, you MUST verify the webhook signature using crypto
     // const signature = req.headers.get('x-razorpay-signature')
 
@@ -25,14 +25,14 @@ serve(async (req) => {
     // Handle payment.captured (Funds moved to Escrow)
     if (payload.event === 'payment.captured') {
       const payment = payload.payload.payment.entity;
-      
+
       // Update escrow transaction status
       await supabase
         .from('escrow_transactions')
         .update({ status: 'held_in_escrow' })
         .eq('razorpay_payment_id', payment.id);
     }
-    
+
     // Handle Escrow settlement/release trigger logic
     // Usually handled by a cron job or webhook when event is done
 
