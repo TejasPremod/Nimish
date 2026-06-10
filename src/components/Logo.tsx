@@ -13,7 +13,7 @@ export const Logo = ({ className }: LogoProps) => {
   return (
     <div className={cn("relative flex items-center justify-center cursor-pointer", className)}>
       <img
-        src="/logobar.png"
+        src="/logo.png"
         alt="Nimish Logo"
         className="w-full h-auto object-contain"
       />
