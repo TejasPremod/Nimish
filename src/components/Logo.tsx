@@ -12,9 +12,9 @@ interface LogoProps {
 export const Logo = ({ className }: LogoProps) => {
   return (
     <div className={cn("relative flex items-center justify-center cursor-pointer", className)}>
-      <img 
+      <img
         src="/logo.png"
-        alt="Nimish Logo" 
+        alt="Nimish Logo"
         className="w-full h-auto object-contain"
       />
     </div>
