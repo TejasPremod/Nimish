@@ -68,18 +68,23 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let mounted = true;
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       if (!mounted) return;
       setSession(session);
       setUser(session?.user || null);
       
       if (session?.user) {
-        await fetchProfile(session.user.id);
+        // Run database queries asynchronously in setTimeout to avoid client deadlocks
+        setTimeout(async () => {
+          if (mounted) {
+            await fetchProfile(session.user.id);
+            if (mounted) setLoading(false);
+          }
+        }, 0);
       } else {
         setProfile(null);
+        setLoading(false);
       }
-      
-      if (mounted) setLoading(false);
     });
 
     return () => {
