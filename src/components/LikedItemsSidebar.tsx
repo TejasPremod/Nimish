@@ -1,9 +1,12 @@
 import { motion, AnimatePresence } from "motion/react";
 import { X, HeartCrack, ArrowRight } from "lucide-react";
 import { useLikedItems } from "../lib/LikedItemsContext";
+import { useBodyScrollLock } from "../hooks/useBodyScrollLock";
 
 export const LikedItemsSidebar = () => {
   const { likedItems, toggleLike, isSidebarOpen, setSidebarOpen } = useLikedItems();
+
+  useBodyScrollLock(isSidebarOpen);
 
   return (
     <AnimatePresence>

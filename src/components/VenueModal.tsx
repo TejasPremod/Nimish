@@ -8,6 +8,7 @@ import { BookingPaymentModal } from "./BookingPaymentModal";
 import { useLikedItems, LikedItem } from "../lib/LikedItemsContext";
 import { cn } from "../lib/utils";
 import { useAuth } from "../contexts/AuthContext";
+import { useBodyScrollLock } from "../hooks/useBodyScrollLock";
 
 interface Venue {
   id: number;
@@ -25,6 +26,7 @@ interface VenueModalProps {
 }
 
 export const VenueModal = ({ venue, onClose }: VenueModalProps) => {
+  useBodyScrollLock(true);
   const galleryRef = useRef<HTMLDivElement>(null);
   const [showCalendar, setShowCalendar] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);

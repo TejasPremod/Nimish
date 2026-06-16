@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, ShieldCheck, CreditCard, CheckCircle2, Lock } from "lucide-react";
 import { supabase } from "../lib/supabase";
+import { useBodyScrollLock } from "../hooks/useBodyScrollLock";
 
 interface BookingPaymentModalProps {
   entityId: number;
@@ -13,6 +14,7 @@ interface BookingPaymentModalProps {
 }
 
 export const BookingPaymentModal = ({ entityId, entityType, date, amount, onClose, onSuccess }: BookingPaymentModalProps) => {
+  useBodyScrollLock(true);
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<"details" | "processing" | "success">("details");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);

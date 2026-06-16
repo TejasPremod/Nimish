@@ -10,12 +10,15 @@ import { Logo } from "./Logo";
 import { Menu, X, LogOut, Heart } from "lucide-react";
 import { useAuth } from "../contexts/AuthContext";
 import { useLikedItems } from "../lib/LikedItemsContext";
+import { useBodyScrollLock } from "../hooks/useBodyScrollLock";
 
 export const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, profile, signOut } = useAuth();
   const { likedItems, setSidebarOpen } = useLikedItems();
+
+  useBodyScrollLock(isMobileMenuOpen);
 
   useEffect(() => {
     const handleScroll = () => {
